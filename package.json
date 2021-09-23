@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "typescript": "^4.4.3"
+  },
+  "name": "lab1",
+  "version": "1.0.0",
+  "main": "main.js",
+  "license": "MIT"
+}
