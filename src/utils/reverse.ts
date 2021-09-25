@@ -1,6 +1,6 @@
 import {Automaton} from '../types/types'
 
-function reverseAutomaton(automaton: Automaton): Automaton {
+function reverse(automaton: Automaton): Automaton {
 	const newAutomaton = {...automaton}
 
 	newAutomaton.fn = {}
@@ -15,5 +15,5 @@ function reverseAutomaton(automaton: Automaton): Automaton {
 }
 
 export {
-	reverseAutomaton,
+	reverse,
 }

@@ -11,10 +11,16 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.determineAutomaton = void 0;
-function determineAutomaton(automaton) {
+exports.determine = void 0;
+function determine(automaton) {
     var newAutomaton = __assign({}, automaton);
-    newAutomaton.fn = automaton.fn;
+    automaton.Q.forEach(function (q) {
+        automaton.X.forEach(function (x) {
+            if (automaton.fn[q][x].length > 1) {
+                //todo determine
+            }
+        });
+    });
     return newAutomaton;
 }
-exports.determineAutomaton = determineAutomaton;
+exports.determine = determine;

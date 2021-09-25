@@ -11,8 +11,8 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reverseAutomaton = void 0;
-function reverseAutomaton(automaton) {
+exports.reverse = void 0;
+function reverse(automaton) {
     var newAutomaton = __assign({}, automaton);
     newAutomaton.fn = {};
     automaton.Q.forEach(function (q) {
@@ -23,4 +23,4 @@ function reverseAutomaton(automaton) {
     });
     return newAutomaton;
 }
-exports.reverseAutomaton = reverseAutomaton;
+exports.reverse = reverse;
