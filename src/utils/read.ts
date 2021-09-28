@@ -3,6 +3,13 @@ const process = require('process')
 const file = process.argv[2]
 const fs = require('fs')
 
+function getStates(rawData: string): [string, Array<string>] {
+	return [
+		rawData.split(':')[0].trim(),
+		rawData.split(':')[1].trim().split(/\s+/),
+	]
+}
+
 function readAutomaton(): Automaton {
 	const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/)
 	const automaton : Automaton = {
@@ -16,17 +23,36 @@ function readAutomaton(): Automaton {
 		automaton.Q = lines[4].trim().split(/\s+/)
 		automaton.Y = lines[5].trim().split(/\s+/)
 		for (let i = 6; i < lines.length; ++i) {
-			const x = lines[i].split(':')[0].trim()
-			const newStates = lines[i].split(':')[1].trim().split(/\s+/)
+			const [x, newStates] = getStates(lines[i])
 			automaton.X.push(x)
 			automaton.Q.forEach(q => {
-				automaton.fn[q] = automaton.fn[q] || {}
-				automaton.fn[q][x] = newStates.shift()
+				automaton.fn[q] = {}
+				automaton.fn[q][x] = []
+				const newQ = newStates.shift()
+				automaton.fn[q][x].push({
+					q: newQ,
+					y: automaton.Y[automaton.Q.indexOf(newQ)],
+				})
 			})
 		}
 	}
 	else if (lines[0] === 'Ml') {
-
+		automaton.Q = lines[4].trim().split(/\s+/)
+		for (let i = 5; i <= lines.length - 1; i += 2)
+		{
+			const [x, newStates] = getStates(lines[i])
+			const outputSignals = lines[i + 1].trim().split(/\s+/)
+			automaton.X.push(x)
+			automaton.Q.forEach(q => {
+				automaton.fn[q] = {}
+				automaton.fn[q][x] = []
+				automaton.fn[q][x].push({
+					q: newStates.shift(),
+					y: outputSignals.shift(),
+				})
+			})
+			automaton.Y.push(lines[i + 1].trim().split(/\s+/))
+		}
 	}
 
 	return automaton
