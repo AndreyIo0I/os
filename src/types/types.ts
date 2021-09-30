@@ -1,14 +1,18 @@
+type Transition = {
+	q: string
+	y: string
+}
+
+type QTransitions = {
+	[x: string]: Array<Transition>
+}
+
 interface Automaton {
 	Q: Array<string>
 	X: Array<string>
 	Y: Array<string>
 	fn: {
-		[q: string]: {
-			[x: string]: Array<{
-				q: string
-				y: string
-			}>
-		}
+		[q: string]: QTransitions
 	}
 	q0?: string
 	qf?: Array<string>
@@ -16,4 +20,6 @@ interface Automaton {
 
 export {
 	Automaton,
+	Transition,
+	QTransitions,
 }

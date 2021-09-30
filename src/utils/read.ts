@@ -1,4 +1,4 @@
-import {Automaton} from '../types/types'
+import {Automaton, Transition} from '../types/types'
 const process = require('process')
 const file = process.argv[2]
 const fs = require('fs')
@@ -26,12 +26,12 @@ function readAutomaton(): Automaton {
 			const [x, newStates] = getStates(lines[i])
 			automaton.X.push(x)
 			automaton.Q.forEach(q => {
-				automaton.fn[q] = {}
+				automaton.fn[q] = automaton.fn[q] || {}
 				automaton.fn[q][x] = []
 				const newQ = newStates.shift()
-				automaton.fn[q][x].push({
+				automaton.fn[q][x].push(<Transition>{
 					q: newQ,
-					y: automaton.Y[automaton.Q.indexOf(newQ)],
+					y: automaton.Y[automaton.Q.indexOf(<string>newQ)],
 				})
 			})
 		}
@@ -44,15 +44,16 @@ function readAutomaton(): Automaton {
 			const outputSignals = lines[i + 1].trim().split(/\s+/)
 			automaton.X.push(x)
 			automaton.Q.forEach(q => {
-				automaton.fn[q] = {}
+				automaton.fn[q] = automaton.fn[q] || {}
 				automaton.fn[q][x] = []
-				automaton.fn[q][x].push({
+				automaton.fn[q][x].push(<Transition>{
 					q: newStates.shift(),
 					y: outputSignals.shift(),
 				})
 			})
-			automaton.Y.push(lines[i + 1].trim().split(/\s+/))
+			automaton.Y.push(...lines[i + 1].trim().split(/\s+/))
 		}
+		automaton.Y = [...new Set(automaton.Y)]
 	}
 
 	return automaton
