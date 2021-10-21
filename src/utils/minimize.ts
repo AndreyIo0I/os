@@ -2,62 +2,33 @@ import {Automaton, QTransitions} from '../types/types'
 import {reverse} from './reverse'
 import {determine} from './determine'
 
-type EquivalenceClass = Array<[QTransitions, Array<string>]>
+type EquivalenceClasses = { [equivalence: string]: Array<string> }
 
-function equals(a: EquivalenceClass, b: EquivalenceClass, xArray: Array<string>): boolean {
-	let result = true
+function hopcraftMinimization(automaton: Automaton): Automaton {
+	const QtoEquivalence : { [q: string]: string } = {}
+	const equivalenceClasses : EquivalenceClasses = {}
 
-	if (a.length !== b.length) {
-		return false
-	}
-	a.forEach((equivalence, index) => {
-		xArray.forEach(x => {
-			if (equivalence[0][x][0].y !== b[index][0][x][0].y) {
-				result = false
-				return
-			}
+	// определить классы эквивалентности
+	automaton.Q.forEach(q => {
+		let equivalence = ''
+		automaton.X.forEach(x => {
+			equivalence += automaton.fn[q][x][0].y
 		})
-		if (!result) {
-			return
+		QtoEquivalence[q] = equivalence
+		equivalenceClasses[equivalence] = [...equivalenceClasses[equivalence], q]
+	})
+
+	// разбить классы эквивалентности
+	let newEquivalenceClasses : EquivalenceClasses = {}
+	automaton.Q.forEach(q => {
+		if (equivalenceClasses[QtoEquivalence[q]].length > 1) {
+			let equivalence = ''
+			automaton.X.forEach(x => {
+				equivalence += automaton.fn[q][x][0].y
+			})
 		}
 	})
 
-	return result
-}
-
-function hopcraftMinimization(automaton: Automaton): Automaton {
-	let notMinimized = true
-	let equivalenceClasses: EquivalenceClass = []
-	let lastEquivalenceClasses: EquivalenceClass = []
-
-	while (notMinimized) {
-		notMinimized = false
-
-		automaton.Q.forEach(q => {
-			let equivalenceClassFound = false
-			for (const equivalenceClass of equivalenceClasses) {
-				automaton.X.forEach(x => {
-					if (equivalenceClass[0][x][0].y === automaton.fn[q][x][0].y) {
-						equivalenceClassFound = true
-						equivalenceClass[1].push(q)
-					}
-				})
-				if (equivalenceClassFound) {
-					break
-				}
-			}
-			if (!equivalenceClassFound) {
-				equivalenceClasses.push([automaton.fn[q], [q]])
-			}
-		})
-
-		if (!equals(equivalenceClasses, lastEquivalenceClasses, automaton.X)) {
-			lastEquivalenceClasses = equivalenceClasses
-			equivalenceClasses = []
-			notMinimized = true
-		}
-	}
-	console.log(equivalenceClasses)
 	return automaton
 }
 
