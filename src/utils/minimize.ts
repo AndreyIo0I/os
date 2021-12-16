@@ -5,8 +5,8 @@ import {determine} from './determine'
 type EquivalenceClasses = { [equivalence: string]: Array<string> }
 
 function hopcraftMinimization(automaton: Automaton): Automaton {
-	const QtoEquivalence : { [q: string]: string } = {}
-	const equivalenceClasses : EquivalenceClasses = {}
+	const QtoEquivalence: { [q: string]: string } = {}
+	const equivalenceClasses: EquivalenceClasses = {}
 
 	// определить классы эквивалентности
 	automaton.Q.forEach(q => {
@@ -19,7 +19,7 @@ function hopcraftMinimization(automaton: Automaton): Automaton {
 	})
 
 	// разбить классы эквивалентности
-	let newEquivalenceClasses : EquivalenceClasses = {}
+	let newEquivalenceClasses: EquivalenceClasses = {}
 	automaton.Q.forEach(q => {
 		if (equivalenceClasses[QtoEquivalence[q]].length > 1) {
 			let equivalence = ''
