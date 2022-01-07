@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reverse = void 0;
 function reverse(automaton) {
-    const newAutomaton = Object.assign({}, automaton);
+    const newAutomaton = { ...automaton };
     newAutomaton.fn = {};
     automaton.Q.forEach(q => {
         automaton.X.forEach(x => {
