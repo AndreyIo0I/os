@@ -15,7 +15,6 @@ interface Automaton {
 		[q: string]: QTransitions
 	}
 	q0?: string
-	qf?: Array<string>
 }
 
 export {

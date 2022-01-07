@@ -1,6 +1,4 @@
 import {Automaton, Transition} from '../types/types'
-const process = require('process')
-const file = process.argv[2]
 const fs = require('fs')
 
 function getStates(rawData: string): [string, Array<string>] {
@@ -10,7 +8,7 @@ function getStates(rawData: string): [string, Array<string>] {
 	]
 }
 
-function readAutomaton(): Automaton {
+function readAutomaton(file: string): Automaton {
 	const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/)
 	const automaton : Automaton = {
 		Q: [],
@@ -20,9 +18,9 @@ function readAutomaton(): Automaton {
 	}
 
 	if (lines[0] === 'Mr') {
-		automaton.Q = lines[4].trim().split(/\s+/)
-		automaton.Y = lines[5].trim().split(/\s+/)
-		for (let i = 6; i < lines.length; ++i) {
+		automaton.Q = lines[1].trim().split(/\s+/)
+		automaton.Y = lines[2].trim().split(/\s+/)
+		for (let i = 3; i < lines.length; ++i) {
 			const [x, newStates] = getStates(lines[i])
 			automaton.X.push(x)
 			automaton.Q.forEach(q => {
@@ -37,8 +35,8 @@ function readAutomaton(): Automaton {
 		}
 	}
 	else if (lines[0] === 'Ml') {
-		automaton.Q = lines[4].trim().split(/\s+/)
-		for (let i = 5; i <= lines.length - 1; i += 2)
+		automaton.Q = lines[1].trim().split(/\s+/)
+		for (let i = 2; i <= lines.length - 1; i += 2)
 		{
 			const [x, newStates] = getStates(lines[i])
 			const outputSignals = lines[i + 1].trim().split(/\s+/)
@@ -53,8 +51,8 @@ function readAutomaton(): Automaton {
 			})
 			automaton.Y.push(...lines[i + 1].trim().split(/\s+/))
 		}
-		automaton.Y = [...new Set(automaton.Y)]
 	}
+	automaton.Y = [...new Set(automaton.Y)]
 
 	return automaton
 }

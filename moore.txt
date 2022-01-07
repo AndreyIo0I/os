@@ -1,7 +1,4 @@
 Mr
-2
-3
-4
      s1   s2   s3   s4
      y1   y2   y1   y3
 x1:  s4   s1   s2   s3

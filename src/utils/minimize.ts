@@ -1,35 +1,63 @@
-import {Automaton, QTransitions} from '../types/types'
+import {Automaton} from '../types/types'
 import {reverse} from './reverse'
 import {determine} from './determine'
+import {deepCopy} from './utils'
 
 type EquivalenceClasses = { [equivalence: string]: Array<string> }
+type StateToEquivalence = { [state: string]: string }
 
-function hopcraftMinimization(automaton: Automaton): Automaton {
-	const QtoEquivalence: { [q: string]: string } = {}
-	const equivalenceClasses: EquivalenceClasses = {}
+function minimize(automaton: Automaton): void {
+	let equivalences: EquivalenceClasses = {}
+	let stateToEquivalence: StateToEquivalence = {}
 
-	// определить классы эквивалентности
 	automaton.Q.forEach(q => {
-		let equivalence = ''
-		automaton.X.forEach(x => {
-			equivalence += automaton.fn[q][x][0].y
-		})
-		QtoEquivalence[q] = equivalence
-		equivalenceClasses[equivalence] = [...equivalenceClasses[equivalence], q]
+		const equivalence = automaton.X.map(x => automaton.fn[q][x][0].y).join(' ')
+		if (!equivalences[equivalence]) {
+			equivalences[equivalence] = []
+		}
+		equivalences[equivalence].push(q)
+		stateToEquivalence[q] = equivalence
 	})
 
-	// разбить классы эквивалентности
-	let newEquivalenceClasses: EquivalenceClasses = {}
-	automaton.Q.forEach(q => {
-		if (equivalenceClasses[QtoEquivalence[q]].length > 1) {
-			let equivalence = ''
-			automaton.X.forEach(x => {
-				equivalence += automaton.fn[q][x][0].y
+	let smashed = true
+	while (smashed) {
+		smashed = false
+		let newEquivalences: EquivalenceClasses = {}
+		let newStateToEquivalence: StateToEquivalence = {}
+		for (const equivalenceName in equivalences) {
+			const equivalence = equivalences[equivalenceName]
+			equivalence.forEach(q => {
+				const vectorOfEquivalences = automaton.X.map(x => stateToEquivalence[automaton.fn[q][x][0].q])
+				const newEquivalenceName = equivalenceName + '->' + vectorOfEquivalences.join(' ')
+				if (!newEquivalences[newEquivalenceName]) {
+					newEquivalences[newEquivalenceName] = []
+				}
+				newEquivalences[newEquivalenceName].push(q)
 			})
 		}
-	})
 
-	return automaton
+		if (Object.keys(newEquivalences).length !== Object.keys(equivalences).length) {
+			smashed = true
+		}
+		equivalences = deepCopy(newEquivalences)
+		newStateToEquivalence = deepCopy(stateToEquivalence)
+	}
+
+	const duplicates = Object.keys(equivalences).flatMap(key => equivalences[key].slice(1))
+	automaton.Q = automaton.Q.filter(v => !duplicates.includes(v))
+	duplicates.forEach(duplicate => {
+		delete automaton.fn[duplicate]
+	})
+	Object.keys(automaton.fn).forEach(q => {
+		Object.keys(automaton.fn[q]).forEach(x => {
+			if (duplicates.includes(automaton.fn[q][x][0].q)) {
+				automaton.fn[q][x][0].q = equivalences[stateToEquivalence[automaton.fn[q][x][0].q]][0]
+			}
+		})
+	})
+	if (automaton.q0 && duplicates.includes(automaton.q0)) {
+		automaton.q0 = equivalences[stateToEquivalence[automaton.q0]][0]
+	}
 }
 
 function brzozowskiMinimization(automaton: Automaton): Automaton {
@@ -38,5 +66,5 @@ function brzozowskiMinimization(automaton: Automaton): Automaton {
 
 export {
 	brzozowskiMinimization,
-	hopcraftMinimization,
+	minimize,
 }
