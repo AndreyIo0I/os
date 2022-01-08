@@ -18,28 +18,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const read_1 = require("./src/utils/read");
 const process = __importStar(require("process"));
-const util = __importStar(require("util"));
-const fs_1 = __importDefault(require("fs"));
 const convert_1 = require("./src/utils/convert");
+const utils_1 = require("./src/utils/utils");
+const print_1 = require("./src/utils/print");
 const file = process.argv[2] || 'moore.txt';
 const automaton = (0, read_1.readAutomaton)(file);
-const fileData = fs_1.default.readFileSync(file, 'utf-8');
-if (fileData.startsWith('Ml')) {
-    (0, convert_1.convertToMoore)(automaton);
-    console.log(util.inspect(automaton, {
-        depth: 5,
-        colors: true,
-    }));
+if ((0, utils_1.isMoore)(automaton)) {
+    (0, print_1.printAutomaton)(automaton, true);
 }
 else {
-    console.log(util.inspect(automaton, {
-        depth: 5,
-        colors: true,
-    }));
+    (0, convert_1.convertToMoore)(automaton);
+    (0, print_1.printAutomaton)(automaton);
 }
