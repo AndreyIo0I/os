@@ -12,7 +12,11 @@ function printAutomaton(automaton: Automaton, asMealy = false): void {
 
 		process.stdout.write('Mr\n')
 		process.stdout.write('    ' + automaton.Q.join(' ') + '\n')
-		process.stdout.write('    ' + automaton.Q.map(q => stateToValue[q]).join(' ') + '\n')
+		/*
+		 * '__' используется для неопределённого значения,
+		 * когда в форме милли в это состояние нельзя было попасть из другого
+		 */
+		process.stdout.write('    ' + automaton.Q.map(q => stateToValue[q] || '__').join(' ') + '\n')
 		automaton.X.forEach(x => {
 			process.stdout.write(x + ': ')
 			process.stdout.write(automaton.Q.map(q => automaton.fn[q][x][0].q).join(' ') + '\n')
