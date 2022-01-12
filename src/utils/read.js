@@ -1,7 +1,26 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readAutomaton = void 0;
-const fs = require('fs');
+const fs = __importStar(require("fs"));
 function getStates(rawData) {
     return [
         rawData.split(':')[0].trim(),
@@ -42,10 +61,17 @@ function readAutomaton(file) {
             automaton.Q.forEach(q => {
                 automaton.fn[q] = automaton.fn[q] || {};
                 automaton.fn[q][x] = [];
-                automaton.fn[q][x].push({
-                    q: newStates.shift(),
-                    y: outputSignals.shift(),
-                });
+                const transitionNewStates = newStates.shift().split(',');
+                const transitionOutputSignals = outputSignals.shift().split(',');
+                if (transitionNewStates.length !== transitionOutputSignals.length) {
+                    throw Error(`Number of new states and signals doesn't match`);
+                }
+                for (let i = 0; i < transitionNewStates.length; ++i) {
+                    automaton.fn[q][x].push({
+                        q: transitionNewStates[i],
+                        y: transitionOutputSignals[i],
+                    });
+                }
             });
             automaton.Y.push(...lines[i + 1].trim().split(/\s+/));
         }

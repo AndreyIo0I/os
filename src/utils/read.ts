@@ -1,5 +1,5 @@
 import {Automaton, Transition} from '../types/types'
-const fs = require('fs')
+import * as fs from 'fs'
 
 function getStates(rawData: string): [string, Array<string>] {
 	return [
@@ -36,18 +36,24 @@ function readAutomaton(file: string): Automaton {
 	}
 	else if (lines[0] === 'Ml') {
 		automaton.Q = lines[1].trim().split(/\s+/)
-		for (let i = 2; i <= lines.length - 1; i += 2)
-		{
+		for (let i = 2; i <= lines.length - 1; i += 2) {
 			const [x, newStates] = getStates(lines[i])
 			const outputSignals = lines[i + 1].trim().split(/\s+/)
 			automaton.X.push(x)
 			automaton.Q.forEach(q => {
 				automaton.fn[q] = automaton.fn[q] || {}
 				automaton.fn[q][x] = []
-				automaton.fn[q][x].push(<Transition>{
-					q: newStates.shift(),
-					y: outputSignals.shift(),
-				})
+				const transitionNewStates = newStates.shift()!.split(',')
+				const transitionOutputSignals = outputSignals.shift()!.split(',')
+				if (transitionNewStates.length !== transitionOutputSignals.length) {
+					throw Error(`Number of new states and signals doesn't match`)
+				}
+				for (let i = 0; i < transitionNewStates.length; ++i) {
+					automaton.fn[q][x].push({
+						q: transitionNewStates[i],
+						y: transitionOutputSignals[i],
+					})
+				}
 			})
 			automaton.Y.push(...lines[i + 1].trim().split(/\s+/))
 		}

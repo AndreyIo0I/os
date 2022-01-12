@@ -19,7 +19,7 @@ function printAutomaton(automaton: Automaton, asMealy = false): void {
 		process.stdout.write('    ' + automaton.Q.map(q => stateToValue[q] || '__').join(' ') + '\n')
 		automaton.X.forEach(x => {
 			process.stdout.write(x + ': ')
-			process.stdout.write(automaton.Q.map(q => automaton.fn[q][x][0].q).join(' ') + '\n')
+			process.stdout.write(automaton.Q.map(q => automaton.fn[q][x].map(t => t.q).join(',')).join(' ') + '\n')
 		})
 	}
 	else {
@@ -27,8 +27,8 @@ function printAutomaton(automaton: Automaton, asMealy = false): void {
 		process.stdout.write('    ' + automaton.Q.join(' ') + '\n')
 		automaton.X.forEach(x => {
 			process.stdout.write(x + ': ')
-			process.stdout.write(automaton.Q.map(q => automaton.fn[q][x][0].q).join(' ') + '\n')
-			process.stdout.write('    ' + automaton.Q.map(q => automaton.fn[q][x][0].y).join(' ') + '\n')
+			process.stdout.write(automaton.Q.map(q => automaton.fn[q][x].map(t => t.q).join(',')).join(' ') + '\n')
+			process.stdout.write('    ' + automaton.Q.map(q => automaton.fn[q][x].map(t => t.y).join(',')).join(' ') + '\n')
 		})
 	}
 }
