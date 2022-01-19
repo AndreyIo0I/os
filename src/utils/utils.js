@@ -9,12 +9,13 @@ function isMoore(automaton) {
     const stateToValue = {};
     for (const q of automaton.Q) {
         for (const x of automaton.X) {
-            const transition = automaton.fn[q][x][0];
-            if (stateToValue[transition.q] && stateToValue[transition.q] !== transition.y) {
-                return false;
-            }
-            else {
-                stateToValue[transition.q] = transition.y;
+            for (const transition of automaton.fn[q][x] || []) {
+                if (stateToValue[transition.q] && stateToValue[transition.q] !== transition.y) {
+                    return false;
+                }
+                else {
+                    stateToValue[transition.q] = transition.y;
+                }
             }
         }
     }

@@ -29,12 +29,13 @@ function determine(originalAutomaton) {
                         if (!automaton.fn[newQ][x]) {
                             automaton.fn[newQ][x] = [];
                         }
-                        automaton.fn[t.q][x].forEach(t => {
+                        automaton.fn[t.q][x].forEach(innerT => {
                             if (newQ === 's1s2') {
-                                console.log(t);
+                                console.log(innerT);
                             }
-                            if (automaton.fn[newQ][x].every(v => v.q !== t.q && v.y !== t.y)) {
-                                automaton.fn[newQ][x].push(t); // надо сортировать
+                            if (automaton.fn[newQ][x].every(v => v.q !== innerT.q && v.y !== innerT.y)) {
+                                automaton.fn[newQ][x].push(innerT);
+                                automaton.fn[newQ][x].sort(sortTransitions);
                             }
                         });
                     });

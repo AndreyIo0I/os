@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertToMoore = void 0;
 const utils_1 = require("./utils");
-const STATE_VALUE_SEPARATOR = '/';
+const STATE_VALUE_SEPARATOR = '#';
 function convertToMoore(automaton) {
     const outdatedStates = new Set();
     const newStates = new Set();

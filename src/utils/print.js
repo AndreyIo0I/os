@@ -2,34 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.printAutomaton = void 0;
 const utils_1 = require("./utils");
-function printAutomaton(automaton, asMealy = false) {
-    if (!asMealy && (0, utils_1.isMoore)(automaton)) {
-        const stateToValue = {};
-        automaton.Q.forEach(q => {
-            automaton.X.forEach(x => {
-                stateToValue[automaton.fn[q][x][0].q] = automaton.fn[q][x][0].y;
-            });
+function printAutomaton(automaton) {
+    const table = (0, utils_1.deepCopy)(automaton.fn);
+    Object.keys(table).forEach(q => {
+        Object.keys(table[q]).forEach(x => {
+            table[q][x] = table[q][x].map((t) => t.y ? `${t.q}/${t.y}` : t.q).join(',');
         });
-        process.stdout.write('Mr\n');
-        process.stdout.write('    ' + automaton.Q.join(' ') + '\n');
-        /*
-         * '__' используется для неопределённого значения,
-         * когда в форме милли в это состояние нельзя было попасть из другого
-         */
-        process.stdout.write('    ' + automaton.Q.map(q => stateToValue[q] || '__').join(' ') + '\n');
-        automaton.X.forEach(x => {
-            process.stdout.write(x + ': ');
-            process.stdout.write(automaton.Q.map(q => automaton.fn[q][x].map(t => t.q).join(',')).join(' ') + '\n');
-        });
-    }
-    else {
-        process.stdout.write('Ml\n');
-        process.stdout.write('    ' + automaton.Q.join(' ') + '\n');
-        automaton.X.forEach(x => {
-            process.stdout.write(x + ': ');
-            process.stdout.write(automaton.Q.map(q => automaton.fn[q][x].map(t => t.q).join(',')).join(' ') + '\n');
-            process.stdout.write('    ' + automaton.Q.map(q => automaton.fn[q][x].map(t => t.y).join(',')).join(' ') + '\n');
-        });
-    }
+    });
+    console.table(table);
 }
 exports.printAutomaton = printAutomaton;

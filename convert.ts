@@ -9,7 +9,7 @@ const file = process.argv[2] || 'moore.txt'
 const automaton = readAutomaton(file)
 
 if (isMoore(automaton)) {
-	printAutomaton(automaton, true)
+	printAutomaton(automaton)
 }
 else {
 	convertToMoore(automaton)

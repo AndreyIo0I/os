@@ -1,7 +1,7 @@
 import {Automaton} from '../types/types'
 import {deepCopy} from './utils'
 
-const STATE_VALUE_SEPARATOR = '/'
+const STATE_VALUE_SEPARATOR = '#'
 
 function convertToMoore(automaton: Automaton): void {
 	const outdatedStates: Set<string> = new Set()

@@ -55,8 +55,8 @@ function minimize(automaton: Automaton): void {
 			}
 		})
 	})
-	if (automaton.q0 && duplicates.includes(automaton.q0)) {
-		automaton.q0 = equivalences[stateToEquivalence[automaton.q0]][0]
+	if (automaton.qs && duplicates.includes(automaton.qs)) {
+		automaton.qs = equivalences[stateToEquivalence[automaton.qs]][0]
 	}
 }
 
