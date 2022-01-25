@@ -2,11 +2,53 @@ import {Automaton} from '../types/types'
 import {reverse} from './reverse'
 import {determine} from './determine'
 import {deepCopy} from './utils'
+import {EPSILON} from '../consts'
 
 type EquivalenceClasses = { [equivalence: string]: Array<string> }
 type StateToEquivalence = { [state: string]: string }
 
+function removeDisconnectedNodes(automaton: Automaton): void {
+	if (!automaton.qs) {
+		return
+	}
+
+	const stack: Array<string> = [automaton.qs]
+	const visited: Set<string> = new Set(stack)
+	while (stack.length) {
+		const head = stack.pop()!
+		Object.keys(automaton.fn[head]).forEach(x => {
+			automaton.fn[head][x].forEach(t => {
+				if (!visited.has(t.q)) {
+					visited.add(t.q)
+					stack.push(t.q)
+				}
+			})
+		})
+	}
+
+	Object.keys(automaton.fn).forEach(q => {
+		if (!visited.has(q)) {
+			delete automaton.fn[q]
+		}
+	})
+}
+
+function removeEpsilons(automaton: Automaton): void {
+	// const newFn = {}
+	// Object.keys(automaton.fn).forEach(q => {
+	// 	Object.keys(automaton.fn[q]).forEach(x => {
+	// 		if (x === EPSILON) {
+	//
+	// 		}
+	// 	})
+	// })
+	// automaton.fn = newFn
+}
+
 function minimize(automaton: Automaton): void {
+	removeDisconnectedNodes(automaton)
+	removeEpsilons(automaton)
+
 	let equivalences: EquivalenceClasses = {}
 	let stateToEquivalence: StateToEquivalence = {}
 

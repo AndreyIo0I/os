@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.regexToAutomaton = void 0;
+const consts_1 = require("../consts");
 function* nameGenerator(base) {
     for (let i = 0;; ++i) {
         yield base + i;
@@ -88,7 +89,7 @@ function createOnionNfa(nfa1, nfa2, stateNameGenerator) {
     const qf = stateNameGenerator.next().value;
     const fn = {
         [qs]: {
-            '@': [
+            [consts_1.EPSILON]: [
                 {
                     q: nfa1.qs,
                     y: '',
@@ -108,24 +109,24 @@ function createOnionNfa(nfa1, nfa2, stateNameGenerator) {
         fn[q] = nfa2.fn[q];
     });
     fn[nfa1.qf] = {
-        '@': [
+        [consts_1.EPSILON]: [
             {
                 q: qf,
                 y: '',
-            }
-        ]
+            },
+        ],
     };
     fn[nfa2.qf] = {
-        '@': [
+        [consts_1.EPSILON]: [
             {
                 q: qf,
                 y: '',
-            }
-        ]
+            },
+        ],
     };
     return {
         Q: [qs, qf, ...nfa1.Q, ...nfa2.Q],
-        X: [...new Set([...nfa1.X, ...nfa2.X, '@'])],
+        X: [...new Set([...nfa1.X, ...nfa2.X, consts_1.EPSILON])],
         Y: [],
         fn,
         qs,
@@ -136,20 +137,20 @@ function createConcatNfa(nfa1, nfa2, stateNameGenerator) {
     const qs = stateNameGenerator.next().value;
     const qf = stateNameGenerator.next().value;
     nfa1.fn[nfa1.qf] = {
-        '@': [{
+        [consts_1.EPSILON]: [{
                 q: nfa2.qs,
                 y: '',
-            }]
+            }],
     };
     nfa2.fn[nfa2.qf] = {
-        '@': [{
+        [consts_1.EPSILON]: [{
                 q: qf,
                 y: '',
-            }]
+            }],
     };
     const fn = {
         [qs]: {
-            '@': [
+            [consts_1.EPSILON]: [
                 {
                     q: nfa1.qs,
                     y: '',
@@ -166,7 +167,7 @@ function createConcatNfa(nfa1, nfa2, stateNameGenerator) {
     });
     return {
         Q: [qs, qf, ...nfa1.Q, ...nfa2.Q],
-        X: [...new Set([...nfa1.X, ...nfa2.X, '@'])],
+        X: [...new Set([...nfa1.X, ...nfa2.X, consts_1.EPSILON])],
         Y: [],
         fn,
         qs,
@@ -178,7 +179,7 @@ function createStarNfa(nfa1, stateNameGenerator) {
     const qf = stateNameGenerator.next().value;
     const fn = {
         [qs]: {
-            '@': [
+            [consts_1.EPSILON]: [
                 {
                     q: nfa1.qs,
                     y: '',
@@ -192,26 +193,25 @@ function createStarNfa(nfa1, stateNameGenerator) {
         [qf]: {},
     };
     fn[nfa1.qf] = {
-        '@': [
+        [consts_1.EPSILON]: [
             {
                 q: qf,
                 y: '',
-            }
-        ]
+            },
+        ],
     };
     Object.keys(nfa1.fn).forEach(q => {
         fn[q] = nfa1.fn[q];
     });
     return {
         Q: [qs, qf, ...nfa1.Q],
-        X: [...new Set([...nfa1.X, '@'])],
+        X: [...new Set([...nfa1.X, consts_1.EPSILON])],
         Y: [],
         fn,
         qs,
         qf,
     };
 }
-// @ - epsilon
 function regexToAutomaton(regex) {
     const postfixRegex = regexToPostfix(regex);
     const stateNameGenerator = nameGenerator('s');

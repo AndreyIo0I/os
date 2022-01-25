@@ -27,9 +27,11 @@ const print_1 = require("./src/utils/print");
 const util = __importStar(require("util"));
 const fs_1 = __importDefault(require("fs"));
 const regexpToAutomaton_1 = require("./src/utils/regexpToAutomaton");
+const minimize_1 = require("./src/utils/minimize");
 const file = process.argv[2] || 'regex.txt';
 let regexp = fs_1.default.readFileSync(file, 'utf-8').trim();
 const automaton = (0, regexpToAutomaton_1.regexToAutomaton)(regexp);
+(0, minimize_1.minimize)(automaton);
 fs_1.default.writeFileSync('automaton.json', JSON.stringify(automaton));
 console.log(util.inspect(automaton, {
     depth: 5,

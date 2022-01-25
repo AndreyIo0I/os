@@ -4,7 +4,43 @@ exports.minimize = exports.brzozowskiMinimization = void 0;
 const reverse_1 = require("./reverse");
 const determine_1 = require("./determine");
 const utils_1 = require("./utils");
+function removeDisconnectedNodes(automaton) {
+    if (!automaton.qs) {
+        return;
+    }
+    const stack = [automaton.qs];
+    const visited = new Set(stack);
+    while (stack.length) {
+        const head = stack.pop();
+        Object.keys(automaton.fn[head]).forEach(x => {
+            automaton.fn[head][x].forEach(t => {
+                if (!visited.has(t.q)) {
+                    visited.add(t.q);
+                    stack.push(t.q);
+                }
+            });
+        });
+    }
+    Object.keys(automaton.fn).forEach(q => {
+        if (!visited.has(q)) {
+            delete automaton.fn[q];
+        }
+    });
+}
+function removeEpsilons(automaton) {
+    // const newFn = {}
+    // Object.keys(automaton.fn).forEach(q => {
+    // 	Object.keys(automaton.fn[q]).forEach(x => {
+    // 		if (x === EPSILON) {
+    //
+    // 		}
+    // 	})
+    // })
+    // automaton.fn = newFn
+}
 function minimize(automaton) {
+    removeDisconnectedNodes(automaton);
+    removeEpsilons(automaton);
     let equivalences = {};
     let stateToEquivalence = {};
     automaton.Q.forEach(q => {

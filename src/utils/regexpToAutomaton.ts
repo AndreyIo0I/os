@@ -1,3 +1,4 @@
+import {EPSILON} from '../consts'
 import {Automaton, Transitions} from '../types/types'
 
 type NameGenerator = Generator<string, string>
@@ -97,7 +98,7 @@ function createOnionNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: Na
 
 	const fn: Transitions = {
 		[qs]: {
-			'@': [
+			[EPSILON]: [
 				{
 					q: nfa1.qs!,
 					y: '',
@@ -117,25 +118,25 @@ function createOnionNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: Na
 		fn[q] = nfa2.fn[q]
 	})
 	fn[nfa1.qf!] = {
-		'@': [
+		[EPSILON]: [
 			{
 				q: qf,
 				y: '',
-			}
-		]
+			},
+		],
 	}
 	fn[nfa2.qf!] = {
-		'@': [
+		[EPSILON]: [
 			{
 				q: qf,
 				y: '',
-			}
-		]
+			},
+		],
 	}
 
 	return {
 		Q: [qs, qf, ...nfa1.Q, ...nfa2.Q],
-		X: [...new Set([...nfa1.X, ...nfa2.X, '@'])],
+		X: [...new Set([...nfa1.X, ...nfa2.X, EPSILON])],
 		Y: [],
 		fn,
 		qs,
@@ -148,21 +149,21 @@ function createConcatNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: N
 	const qf = stateNameGenerator.next().value
 
 	nfa1.fn[nfa1.qf!] = {
-		'@': [{
+		[EPSILON]: [{
 			q: nfa2.qs!,
 			y: '',
-		}]
+		}],
 	}
 	nfa2.fn[nfa2.qf!] = {
-		'@': [{
+		[EPSILON]: [{
 			q: qf,
 			y: '',
-		}]
+		}],
 	}
 
 	const fn: Transitions = {
 		[qs]: {
-			'@': [
+			[EPSILON]: [
 				{
 					q: nfa1.qs!,
 					y: '',
@@ -180,7 +181,7 @@ function createConcatNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: N
 
 	return {
 		Q: [qs, qf, ...nfa1.Q, ...nfa2.Q],
-		X: [...new Set([...nfa1.X, ...nfa2.X, '@'])],
+		X: [...new Set([...nfa1.X, ...nfa2.X, EPSILON])],
 		Y: [],
 		fn,
 		qs,
@@ -194,7 +195,7 @@ function createStarNfa(nfa1: Automaton, stateNameGenerator: NameGenerator): Auto
 
 	const fn: Transitions = {
 		[qs]: {
-			'@': [
+			[EPSILON]: [
 				{
 					q: nfa1.qs!,
 					y: '',
@@ -208,12 +209,12 @@ function createStarNfa(nfa1: Automaton, stateNameGenerator: NameGenerator): Auto
 		[qf]: {},
 	}
 	fn[nfa1.qf!] = {
-		'@': [
+		[EPSILON]: [
 			{
 				q: qf,
 				y: '',
-			}
-		]
+			},
+		],
 	}
 	Object.keys(nfa1.fn).forEach(q => {
 		fn[q] = nfa1.fn[q]
@@ -221,7 +222,7 @@ function createStarNfa(nfa1: Automaton, stateNameGenerator: NameGenerator): Auto
 
 	return {
 		Q: [qs, qf, ...nfa1.Q],
-		X: [...new Set([...nfa1.X, '@'])],
+		X: [...new Set([...nfa1.X, EPSILON])],
 		Y: [],
 		fn,
 		qs,
@@ -229,7 +230,6 @@ function createStarNfa(nfa1: Automaton, stateNameGenerator: NameGenerator): Auto
 	}
 }
 
-// @ - epsilon
 function regexToAutomaton(regex: string): Automaton {
 	const postfixRegex = regexToPostfix(regex)
 
