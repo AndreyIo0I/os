@@ -43,8 +43,8 @@ function minimize(automaton) {
     removeEpsilons(automaton);
     let equivalences = {};
     let stateToEquivalence = {};
-    automaton.Q.forEach(q => {
-        const equivalence = automaton.X.map(x => automaton.fn[q][x][0].y).join(' ');
+    Object.keys(automaton.fn).forEach(q => {
+        const equivalence = Object.keys(automaton.fn[q]).map(x => automaton.fn[q][x][0].y).join(' ');
         if (!equivalences[equivalence]) {
             equivalences[equivalence] = [];
         }
@@ -59,7 +59,7 @@ function minimize(automaton) {
         for (const equivalenceName in equivalences) {
             const equivalence = equivalences[equivalenceName];
             equivalence.forEach(q => {
-                const vectorOfEquivalences = automaton.X.map(x => stateToEquivalence[automaton.fn[q][x][0].q]);
+                const vectorOfEquivalences = Object.keys(automaton.fn[q]).map(x => stateToEquivalence[automaton.fn[q][x][0].q]);
                 const newEquivalenceName = equivalenceName + '->' + vectorOfEquivalences.join(' ');
                 if (!newEquivalences[newEquivalenceName]) {
                     newEquivalences[newEquivalenceName] = [];
@@ -74,7 +74,6 @@ function minimize(automaton) {
         newStateToEquivalence = (0, utils_1.deepCopy)(stateToEquivalence);
     }
     const duplicates = Object.keys(equivalences).flatMap(key => equivalences[key].slice(1));
-    automaton.Q = automaton.Q.filter(v => !duplicates.includes(v));
     duplicates.forEach(duplicate => {
         delete automaton.fn[duplicate];
     });

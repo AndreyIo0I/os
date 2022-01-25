@@ -7,8 +7,8 @@ function convertToMoore(automaton: Automaton): void {
 	const outdatedStates: Set<string> = new Set()
 	const newStates: Set<string> = new Set()
 
-	automaton.Q.forEach(q => {
-		automaton.X.forEach(x => {
+	Object.keys(automaton.fn).forEach(q => {
+		Object.keys(automaton.fn[q]).forEach(x => {
 			outdatedStates.add(automaton.fn[q][x][0].q)
 			const newState = automaton.fn[q][x][0].q + STATE_VALUE_SEPARATOR + automaton.fn[q][x][0].y
 			automaton.fn[q][x][0].q = newState
@@ -21,7 +21,6 @@ function convertToMoore(automaton: Automaton): void {
 	})
 
 	outdatedStates.forEach(q => delete automaton.fn[q])
-	automaton.Q = Object.keys(automaton.fn)
 }
 
 export {

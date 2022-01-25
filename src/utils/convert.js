@@ -6,8 +6,8 @@ const STATE_VALUE_SEPARATOR = '#';
 function convertToMoore(automaton) {
     const outdatedStates = new Set();
     const newStates = new Set();
-    automaton.Q.forEach(q => {
-        automaton.X.forEach(x => {
+    Object.keys(automaton.fn).forEach(q => {
+        Object.keys(automaton.fn[q]).forEach(x => {
             outdatedStates.add(automaton.fn[q][x][0].q);
             const newState = automaton.fn[q][x][0].q + STATE_VALUE_SEPARATOR + automaton.fn[q][x][0].y;
             automaton.fn[q][x][0].q = newState;
@@ -18,6 +18,5 @@ function convertToMoore(automaton) {
         automaton.fn[q] = (0, utils_1.deepCopy)(automaton.fn[q.split(STATE_VALUE_SEPARATOR)[0]]);
     });
     outdatedStates.forEach(q => delete automaton.fn[q]);
-    automaton.Q = Object.keys(automaton.fn);
 }
 exports.convertToMoore = convertToMoore;

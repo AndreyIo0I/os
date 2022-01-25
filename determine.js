@@ -24,7 +24,7 @@ const process = __importStar(require("process"));
 const print_1 = require("./src/utils/print");
 const determine_1 = require("./src/utils/determine");
 const util = __importStar(require("util"));
-const file = process.argv[2] || 'moore.txt';
+const file = process.argv[2] || 'determine.txt';
 let automaton = (0, read_1.readAutomaton)(file);
 automaton = (0, determine_1.determine)(automaton);
 console.log(util.inspect(automaton, {

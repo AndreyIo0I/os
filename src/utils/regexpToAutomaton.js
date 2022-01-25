@@ -66,9 +66,6 @@ function createValueNfa(value, stateNameGenerator) {
     const qs = stateNameGenerator.next().value;
     const qf = stateNameGenerator.next().value;
     return {
-        Q: [qs, qf],
-        X: [value],
-        Y: [],
         fn: {
             [qs]: {
                 [value]: [
@@ -125,9 +122,6 @@ function createOnionNfa(nfa1, nfa2, stateNameGenerator) {
         ],
     };
     return {
-        Q: [qs, qf, ...nfa1.Q, ...nfa2.Q],
-        X: [...new Set([...nfa1.X, ...nfa2.X, consts_1.EPSILON])],
-        Y: [],
         fn,
         qs,
         qf,
@@ -166,9 +160,6 @@ function createConcatNfa(nfa1, nfa2, stateNameGenerator) {
         fn[q] = nfa1.fn[q];
     });
     return {
-        Q: [qs, qf, ...nfa1.Q, ...nfa2.Q],
-        X: [...new Set([...nfa1.X, ...nfa2.X, consts_1.EPSILON])],
-        Y: [],
         fn,
         qs,
         qf,
@@ -204,9 +195,6 @@ function createStarNfa(nfa1, stateNameGenerator) {
         fn[q] = nfa1.fn[q];
     });
     return {
-        Q: [qs, qf, ...nfa1.Q],
-        X: [...new Set([...nfa1.X, consts_1.EPSILON])],
-        Y: [],
         fn,
         qs,
         qf,

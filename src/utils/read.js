@@ -30,35 +30,30 @@ function getStates(rawData) {
 function readAutomaton(file) {
     const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/);
     const automaton = {
-        Q: [],
-        X: [],
-        Y: [],
         fn: {},
     };
     if (lines[0] === 'Mr') {
-        automaton.Q = lines[1].trim().split(/\s+/);
-        automaton.Y = lines[2].trim().split(/\s+/);
+        const states = lines[1].trim().split(/\s+/);
+        const outputs = lines[2].trim().split(/\s+/);
         for (let i = 3; i < lines.length; ++i) {
             const [x, newStates] = getStates(lines[i]);
-            automaton.X.push(x);
-            automaton.Q.forEach(q => {
+            states.forEach(q => {
                 automaton.fn[q] = automaton.fn[q] || {};
                 automaton.fn[q][x] = [];
                 const newQ = newStates.shift();
                 automaton.fn[q][x].push({
                     q: newQ,
-                    y: automaton.Y[automaton.Q.indexOf(newQ)],
+                    y: outputs[states.indexOf(newQ)],
                 });
             });
         }
     }
     else if (lines[0] === 'Ml') {
-        automaton.Q = lines[1].trim().split(/\s+/);
+        const states = lines[1].trim().split(/\s+/);
         for (let i = 2; i <= lines.length - 1; i += 2) {
             const [x, newStates] = getStates(lines[i]);
             const outputSignals = lines[i + 1].trim().split(/\s+/);
-            automaton.X.push(x);
-            automaton.Q.forEach(q => {
+            states.forEach(q => {
                 automaton.fn[q] = automaton.fn[q] || {};
                 automaton.fn[q][x] = [];
                 const transitionNewStates = newStates.shift().split(',');
@@ -73,10 +68,8 @@ function readAutomaton(file) {
                     });
                 }
             });
-            automaton.Y.push(...lines[i + 1].trim().split(/\s+/));
         }
     }
-    automaton.Y = [...new Set(automaton.Y)];
     return automaton;
 }
 exports.readAutomaton = readAutomaton;

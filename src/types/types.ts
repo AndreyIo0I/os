@@ -12,9 +12,6 @@ type Transitions = {
 }
 
 interface Automaton {
-	Q: Array<string>
-	X: Array<string>
-	Y: Array<string>
 	fn: Transitions
 	qs?: string
 	qf?: string
