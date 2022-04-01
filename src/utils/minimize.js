@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.minimize = exports.brzozowskiMinimization = void 0;
+exports.removeDisconnectedNodes = exports.minimize = exports.brzozowskiMinimization = void 0;
 const reverse_1 = require("./reverse");
 const determine_1 = require("./determine");
 const utils_1 = require("./utils");
@@ -27,20 +27,9 @@ function removeDisconnectedNodes(automaton) {
         }
     });
 }
-function removeEpsilons(automaton) {
-    // const newFn = {}
-    // Object.keys(automaton.fn).forEach(q => {
-    // 	Object.keys(automaton.fn[q]).forEach(x => {
-    // 		if (x === EPSILON) {
-    //
-    // 		}
-    // 	})
-    // })
-    // automaton.fn = newFn
-}
+exports.removeDisconnectedNodes = removeDisconnectedNodes;
 function minimize(automaton) {
     removeDisconnectedNodes(automaton);
-    removeEpsilons(automaton);
     let equivalences = {};
     let stateToEquivalence = {};
     Object.keys(automaton.fn).forEach(q => {

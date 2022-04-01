@@ -23,6 +23,7 @@ const read_1 = require("./src/utils/read");
 const minimize_1 = require("./src/utils/minimize");
 const process = __importStar(require("process"));
 const util = __importStar(require("util"));
+const server_1 = require("./src/utils/server");
 const filePath = process.argv[2] || '';
 const automaton = (0, read_1.readAutomaton)(filePath);
 (0, minimize_1.minimize)(automaton);
@@ -31,3 +32,5 @@ console.log(util.inspect(automaton, {
     depth: 5,
     colors: true,
 }));
+(0, server_1.addToVisualize)(automaton, 'minimized');
+(0, server_1.runServer)();

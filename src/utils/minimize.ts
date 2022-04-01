@@ -2,7 +2,6 @@ import {Automaton} from '../types/types'
 import {reverse} from './reverse'
 import {determine} from './determine'
 import {deepCopy} from './utils'
-import {EPSILON} from '../consts'
 
 type EquivalenceClasses = { [equivalence: string]: Array<string> }
 type StateToEquivalence = { [state: string]: string }
@@ -33,21 +32,8 @@ function removeDisconnectedNodes(automaton: Automaton): void {
 	})
 }
 
-function removeEpsilons(automaton: Automaton): void {
-	// const newFn = {}
-	// Object.keys(automaton.fn).forEach(q => {
-	// 	Object.keys(automaton.fn[q]).forEach(x => {
-	// 		if (x === EPSILON) {
-	//
-	// 		}
-	// 	})
-	// })
-	// automaton.fn = newFn
-}
-
 function minimize(automaton: Automaton): void {
 	removeDisconnectedNodes(automaton)
-	removeEpsilons(automaton)
 
 	let equivalences: EquivalenceClasses = {}
 	let stateToEquivalence: StateToEquivalence = {}
@@ -109,4 +95,5 @@ function brzozowskiMinimization(automaton: Automaton): Automaton {
 export {
 	brzozowskiMinimization,
 	minimize,
+	removeDisconnectedNodes,
 }
