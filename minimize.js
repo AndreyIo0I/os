@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -24,7 +28,7 @@ const minimize_1 = require("./src/utils/minimize");
 const process = __importStar(require("process"));
 const util = __importStar(require("util"));
 const server_1 = require("./src/utils/server");
-const filePath = process.argv[2] || '';
+const filePath = process.argv[2] || 'minimize.txt';
 const automaton = (0, read_1.readAutomaton)(filePath);
 (0, minimize_1.minimize)(automaton);
 console.log('==========minimized==========');
@@ -32,5 +36,4 @@ console.log(util.inspect(automaton, {
     depth: 5,
     colors: true,
 }));
-(0, server_1.addToVisualize)(automaton, 'minimized');
 (0, server_1.runServer)();

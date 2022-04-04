@@ -1,7 +1,7 @@
 import {Automaton, Transition} from '../types/types'
 import {deepCopy} from './utils'
 import {EPSILON} from '../consts'
-import {addToVisualize, runServer} from './server'
+import {addToVisualize} from './server'
 import util from 'util'
 
 function sortTransitions(a: Transition, b: Transition): number {
@@ -80,13 +80,13 @@ function removeEpsilons(automaton: Automaton): Automaton {
 	})
 
 	console.log(
-		'==========removed epsilons==========\n'
+		'==========remove epsilons==========\n'
 		+ util.inspect(newAutomaton, {
 			depth: 5,
 			colors: true,
 		})
 	)
-	addToVisualize(newAutomaton, 'removed epsilons')
+	addToVisualize(newAutomaton, 'remove epsilons')
 
 	return newAutomaton
 }
@@ -95,7 +95,7 @@ function determine(originalAutomaton: Automaton): Automaton {
 	const automaton = removeEpsilons(deepCopy(originalAutomaton))
 	const states = [...Object.keys(automaton.fn)]
 
-	while (states.length > 0) {
+	while (states.length) {
 		const q = states.pop()!
 		Object.keys(automaton.fn[q]).forEach(x => {
 			if (automaton.fn[q][x].length > 1) {
@@ -109,34 +109,41 @@ function determine(originalAutomaton: Automaton): Automaton {
 
 				Object.keys(automaton.fn[q]).forEach(x => {
 					automaton.fn[q][x].forEach(t => {
-						if (!automaton.fn[newQ][x])
-							automaton.fn[newQ][x] = []
-						automaton.fn[t.q][x].forEach(innerT => {
-							if (automaton.fn[newQ][x].every(v => v.q !== innerT.q && v.y !== innerT.y)) {
-								automaton.fn[newQ][x].push(innerT)
-								automaton.fn[newQ][x].sort(sortTransitions)
-							}
+
+						Object.keys(automaton.fn[t.q]).forEach(tX => {
+							automaton.fn[t.q][tX].forEach(tT => {
+								if (!automaton.fn[newQ][tX])
+									automaton.fn[newQ][tX] = []
+								if (automaton.fn[newQ][tX].every(v => !(v.q === tT.q && v.y === tT.y))) {
+									automaton.fn[newQ][tX].push(tT)
+									automaton.fn[newQ][tX].sort(sortTransitions)
+								}
+							})
 						})
+
 					})
 				})
 			}
 		})
 	}
 
+	//склейка переходов в склеенных состояниях
 	Object.keys(automaton.fn).forEach(q => {
 		Object.keys(automaton.fn[q]).forEach(x => {
-			automaton.fn[q][x] = [{
-				q: automaton.fn[q][x].map(t => t.q).join(''),
-				y: automaton.fn[q][x].map(t => t.y).join(''),
-			}]
+			if (automaton.fn[q][x].length) {
+				automaton.fn[q][x] = [{
+					q: automaton.fn[q][x].map(t => t.q).join(''),
+					y: automaton.fn[q][x].map(t => t.y).join(''),
+				}]
+			}
 		})
 	})
 
-	console.log('==========determined==========\n'
+	console.log('==========determine==========\n'
 		+ util.inspect(automaton, {
-		depth: 5,
-		colors: true,
-	}))
+			depth: 5,
+			colors: true,
+		}))
 	addToVisualize(automaton, 'determined')
 
 	return automaton

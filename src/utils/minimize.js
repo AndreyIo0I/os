@@ -4,6 +4,7 @@ exports.removeDisconnectedNodes = exports.minimize = exports.brzozowskiMinimizat
 const reverse_1 = require("./reverse");
 const determine_1 = require("./determine");
 const utils_1 = require("./utils");
+const server_1 = require("./server");
 function removeDisconnectedNodes(automaton) {
     if (!automaton.qs) {
         return;
@@ -26,17 +27,19 @@ function removeDisconnectedNodes(automaton) {
             delete automaton.fn[q];
         }
     });
+    (0, server_1.addToVisualize)(automaton, 'remove disconnected nodes');
 }
 exports.removeDisconnectedNodes = removeDisconnectedNodes;
+//автомат должен быть уже детерминизирован
 function minimize(automaton) {
     removeDisconnectedNodes(automaton);
     let equivalences = {};
     let stateToEquivalence = {};
+    //разбиваем на 0-эквивалентности, склеивая выходные значения
     Object.keys(automaton.fn).forEach(q => {
-        const equivalence = Object.keys(automaton.fn[q]).map(x => automaton.fn[q][x][0].y).join(' ');
-        if (!equivalences[equivalence]) {
+        const equivalence = Object.keys(automaton.fn[q]).map(x => x + automaton.fn[q][x][0].y).join(' ');
+        if (!equivalences[equivalence])
             equivalences[equivalence] = [];
-        }
         equivalences[equivalence].push(q);
         stateToEquivalence[q] = equivalence;
     });
@@ -54,13 +57,14 @@ function minimize(automaton) {
                     newEquivalences[newEquivalenceName] = [];
                 }
                 newEquivalences[newEquivalenceName].push(q);
+                newStateToEquivalence[q] = newEquivalenceName;
             });
         }
         if (Object.keys(newEquivalences).length !== Object.keys(equivalences).length) {
             smashed = true;
         }
         equivalences = (0, utils_1.deepCopy)(newEquivalences);
-        newStateToEquivalence = (0, utils_1.deepCopy)(stateToEquivalence);
+        stateToEquivalence = (0, utils_1.deepCopy)(newStateToEquivalence);
     }
     const duplicates = Object.keys(equivalences).flatMap(key => equivalences[key].slice(1));
     duplicates.forEach(duplicate => {
@@ -76,6 +80,7 @@ function minimize(automaton) {
     if (automaton.qs && duplicates.includes(automaton.qs)) {
         automaton.qs = equivalences[stateToEquivalence[automaton.qs]][0];
     }
+    (0, server_1.addToVisualize)(automaton, 'minimize');
 }
 exports.minimize = minimize;
 function brzozowskiMinimization(automaton) {

@@ -18,7 +18,7 @@ function addToVisualize(automaton: Automaton, text = ''): void {
 }
 
 function runServer(): void {
-	fs.writeFileSync('visualize.json', JSON.stringify(info))
+	fs.writeFileSync('visualize.json', JSON.stringify(info.reverse()))
 
 	const app = express()
 	const port = 3000

@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -21,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readAutomaton = void 0;
 const fs = __importStar(require("fs"));
+const server_1 = require("./server");
 function getStates(rawData) {
     return [
         rawData.split(':')[0].trim(),
@@ -70,6 +75,7 @@ function readAutomaton(file) {
             });
         }
     }
+    (0, server_1.addToVisualize)(automaton, 'read from file');
     return automaton;
 }
 exports.readAutomaton = readAutomaton;

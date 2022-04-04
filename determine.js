@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -23,12 +27,9 @@ const read_1 = require("./src/utils/read");
 const process = __importStar(require("process"));
 const print_1 = require("./src/utils/print");
 const determine_1 = require("./src/utils/determine");
-const util = __importStar(require("util"));
+const server_1 = require("./src/utils/server");
 const file = process.argv[2] || 'determine.txt';
 let automaton = (0, read_1.readAutomaton)(file);
 automaton = (0, determine_1.determine)(automaton);
-console.log(util.inspect(automaton, {
-    depth: 5,
-    colors: true,
-}));
 (0, print_1.printAutomaton)(automaton);
+(0, server_1.runServer)();

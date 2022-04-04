@@ -2,9 +2,7 @@ import {Automaton} from '../types/types'
 import {reverse} from './reverse'
 import {determine} from './determine'
 import {deepCopy} from './utils'
-
-type EquivalenceClasses = { [equivalence: string]: Array<string> }
-type StateToEquivalence = { [state: string]: string }
+import {addToVisualize} from './server'
 
 function removeDisconnectedNodes(automaton: Automaton): void {
 	if (!automaton.qs) {
@@ -30,19 +28,25 @@ function removeDisconnectedNodes(automaton: Automaton): void {
 			delete automaton.fn[q]
 		}
 	})
+
+	addToVisualize(automaton, 'remove disconnected nodes')
 }
 
+type EquivalenceClasses = { [equivalence: string]: Array<string> }
+type StateToEquivalence = { [state: string]: string }
+
+//автомат должен быть уже детерминизирован
 function minimize(automaton: Automaton): void {
 	removeDisconnectedNodes(automaton)
 
 	let equivalences: EquivalenceClasses = {}
 	let stateToEquivalence: StateToEquivalence = {}
 
+	//разбиваем на 0-эквивалентности, склеивая выходные значения
 	Object.keys(automaton.fn).forEach(q => {
-		const equivalence = Object.keys(automaton.fn[q]).map(x => automaton.fn[q][x][0].y).join(' ')
-		if (!equivalences[equivalence]) {
+		const equivalence = Object.keys(automaton.fn[q]).map(x => x + automaton.fn[q][x][0].y).join(' ')
+		if (!equivalences[equivalence])
 			equivalences[equivalence] = []
-		}
 		equivalences[equivalence].push(q)
 		stateToEquivalence[q] = equivalence
 	})
@@ -61,6 +65,7 @@ function minimize(automaton: Automaton): void {
 					newEquivalences[newEquivalenceName] = []
 				}
 				newEquivalences[newEquivalenceName].push(q)
+				newStateToEquivalence[q] = newEquivalenceName
 			})
 		}
 
@@ -68,7 +73,7 @@ function minimize(automaton: Automaton): void {
 			smashed = true
 		}
 		equivalences = deepCopy(newEquivalences)
-		newStateToEquivalence = deepCopy(stateToEquivalence)
+		stateToEquivalence = deepCopy(newStateToEquivalence)
 	}
 
 	const duplicates = Object.keys(equivalences).flatMap(key => equivalences[key].slice(1))
@@ -86,6 +91,8 @@ function minimize(automaton: Automaton): void {
 	if (automaton.qs && duplicates.includes(automaton.qs)) {
 		automaton.qs = equivalences[stateToEquivalence[automaton.qs]][0]
 	}
+
+	addToVisualize(automaton, 'minimize')
 }
 
 function brzozowskiMinimization(automaton: Automaton): Automaton {

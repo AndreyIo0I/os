@@ -2,9 +2,9 @@ import {readAutomaton} from './src/utils/read'
 import {minimize} from './src/utils/minimize'
 import * as process from 'process'
 import * as util from 'util'
-import {addToVisualize, runServer} from './src/utils/server'
+import {runServer} from './src/utils/server'
 
-const filePath = process.argv[2] || ''
+const filePath = process.argv[2] || 'minimize.txt'
 const automaton = readAutomaton(filePath)
 
 minimize(automaton)
@@ -14,7 +14,5 @@ console.log(util.inspect(automaton, {
 	depth: 5,
 	colors: true,
 }))
-
-addToVisualize(automaton, 'minimized')
 
 runServer()

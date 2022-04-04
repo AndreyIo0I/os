@@ -1,5 +1,6 @@
 import {Automaton, Transition} from '../types/types'
 import * as fs from 'fs'
+import {addToVisualize} from './server'
 
 function getStates(rawData: string): [string, Array<string>] {
 	return [
@@ -53,6 +54,7 @@ function readAutomaton(file: string): Automaton {
 		}
 	}
 
+	addToVisualize(automaton, 'read from file')
 	return automaton
 }
 

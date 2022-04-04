@@ -16,7 +16,7 @@ function addToVisualize(automaton, text = '') {
 }
 exports.addToVisualize = addToVisualize;
 function runServer() {
-    fs_1.default.writeFileSync('visualize.json', JSON.stringify(info));
+    fs_1.default.writeFileSync('visualize.json', JSON.stringify(info.reverse()));
     const app = (0, express_1.default)();
     const port = 3000;
     app.use(express_1.default.static(__dirname + '\\..\\..'));

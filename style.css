@@ -2,7 +2,11 @@
     margin: 0;
 }
 
+body {
+    padding-bottom: 18vh;
+}
+
 .container {
     width: 100%;
-    height: 50vh;
+    height: 80vh;
 }

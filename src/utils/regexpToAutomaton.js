@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.regexToAutomaton = void 0;
 const consts_1 = require("../consts");
+const server_1 = require("./server");
 function* nameGenerator(base) {
     for (let i = 0;; ++i) {
         yield base + i;
@@ -63,9 +64,10 @@ function regexToPostfix(originRegex) {
     return output;
 }
 function createValueNfa(value, stateNameGenerator) {
+    console.log('createValueNfa', value);
     const qs = stateNameGenerator.next().value;
     const qf = stateNameGenerator.next().value;
-    return {
+    const automaton = {
         fn: {
             [qs]: {
                 [value]: [
@@ -80,8 +82,11 @@ function createValueNfa(value, stateNameGenerator) {
         qs: qs,
         qf: qf,
     };
+    (0, server_1.addToVisualize)(automaton, 'createValueNfa');
+    return automaton;
 }
 function createOnionNfa(nfa1, nfa2, stateNameGenerator) {
+    console.log('createOnionNfa');
     const qs = stateNameGenerator.next().value;
     const qf = stateNameGenerator.next().value;
     const fn = {
@@ -105,29 +110,28 @@ function createOnionNfa(nfa1, nfa2, stateNameGenerator) {
     Object.keys(nfa2.fn).forEach(q => {
         fn[q] = nfa2.fn[q];
     });
-    fn[nfa1.qf] = {
-        [consts_1.EPSILON]: [
-            {
-                q: qf,
-                y: '',
-            },
-        ],
-    };
-    fn[nfa2.qf] = {
-        [consts_1.EPSILON]: [
-            {
-                q: qf,
-                y: '',
-            },
-        ],
-    };
-    return {
+    if (!fn[nfa1.qf][consts_1.EPSILON])
+        fn[nfa1.qf][consts_1.EPSILON] = [];
+    fn[nfa1.qf][consts_1.EPSILON].push({
+        q: qf,
+        y: '',
+    });
+    if (!fn[nfa2.qf][consts_1.EPSILON])
+        fn[nfa2.qf][consts_1.EPSILON] = [];
+    fn[nfa2.qf][consts_1.EPSILON].push({
+        q: qf,
+        y: '',
+    });
+    const automaton = {
         fn,
         qs,
         qf,
     };
+    (0, server_1.addToVisualize)(automaton, 'createOnionNfa');
+    return automaton;
 }
 function createConcatNfa(nfa1, nfa2, stateNameGenerator) {
+    console.log('createConcatNfa');
     const qs = stateNameGenerator.next().value;
     const qf = stateNameGenerator.next().value;
     nfa1.fn[nfa1.qf] = {
@@ -159,11 +163,13 @@ function createConcatNfa(nfa1, nfa2, stateNameGenerator) {
     Object.keys(nfa1.fn).forEach(q => {
         fn[q] = nfa1.fn[q];
     });
-    return {
+    const automaton = {
         fn,
         qs,
         qf,
     };
+    (0, server_1.addToVisualize)(automaton, 'createConcatNfa');
+    return automaton;
 }
 function createStarNfa(nfa1, stateNameGenerator) {
     const qs = stateNameGenerator.next().value;
@@ -172,36 +178,40 @@ function createStarNfa(nfa1, stateNameGenerator) {
         [qs]: {
             [consts_1.EPSILON]: [
                 {
-                    q: nfa1.qs,
-                    y: '',
-                },
-                {
                     q: qf,
                     y: '',
                 },
             ],
         },
-        [qf]: {},
-    };
-    fn[nfa1.qf] = {
-        [consts_1.EPSILON]: [
-            {
-                q: qf,
-                y: '',
-            },
-        ],
+        [qf]: {
+            [consts_1.EPSILON]: [
+                {
+                    q: nfa1.qs,
+                    y: '',
+                },
+            ],
+        },
     };
     Object.keys(nfa1.fn).forEach(q => {
         fn[q] = nfa1.fn[q];
     });
-    return {
+    if (!fn[nfa1.qf][consts_1.EPSILON])
+        fn[nfa1.qf][consts_1.EPSILON] = [];
+    fn[nfa1.qf][consts_1.EPSILON].push({
+        q: qs,
+        y: '',
+    });
+    const automaton = {
         fn,
         qs,
         qf,
     };
+    (0, server_1.addToVisualize)(automaton, 'createStarNfa');
+    return automaton;
 }
 function regexToAutomaton(regex) {
     const postfixRegex = regexToPostfix(regex);
+    console.log('postfixRegex', postfixRegex);
     const stateNameGenerator = nameGenerator('s');
     const nfaStack = [];
     postfixRegex.forEach(v => {
@@ -220,6 +230,8 @@ function regexToAutomaton(regex) {
             nfaStack.push(createStarNfa(nfaStack.pop(), stateNameGenerator));
         }
     });
-    return nfaStack.pop();
+    const automaton = nfaStack.pop();
+    (0, server_1.addToVisualize)(automaton, 'read regex');
+    return automaton;
 }
 exports.regexToAutomaton = regexToAutomaton;

@@ -1,5 +1,6 @@
 import {EPSILON} from '../consts'
 import {Automaton, Transitions} from '../types/types'
+import {addToVisualize} from './server'
 
 type NameGenerator = Generator<string, string>
 
@@ -70,9 +71,11 @@ function regexToPostfix(originRegex: string): Array<string> {
 }
 
 function createValueNfa(value: string, stateNameGenerator: NameGenerator): Automaton {
+	console.log('createValueNfa', value)
 	const qs = stateNameGenerator.next().value
 	const qf = stateNameGenerator.next().value
-	return {
+
+	const automaton = {
 		fn: {
 			[qs]: {
 				[value]: [
@@ -87,9 +90,13 @@ function createValueNfa(value: string, stateNameGenerator: NameGenerator): Autom
 		qs: qs,
 		qf: qf,
 	}
+	addToVisualize(automaton, 'createValueNfa')
+
+	return automaton
 }
 
 function createOnionNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: NameGenerator): Automaton {
+	console.log('createOnionNfa')
 	const qs = stateNameGenerator.next().value
 	const qf = stateNameGenerator.next().value
 
@@ -114,31 +121,33 @@ function createOnionNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: Na
 	Object.keys(nfa2.fn).forEach(q => {
 		fn[q] = nfa2.fn[q]
 	})
-	fn[nfa1.qf!] = {
-		[EPSILON]: [
-			{
-				q: qf,
-				y: '',
-			},
-		],
-	}
-	fn[nfa2.qf!] = {
-		[EPSILON]: [
-			{
-				q: qf,
-				y: '',
-			},
-		],
-	}
 
-	return {
+	if (!fn[nfa1.qf!][EPSILON])
+		fn[nfa1.qf!][EPSILON] = []
+	fn[nfa1.qf!][EPSILON].push({
+		q: qf,
+		y: '',
+	})
+
+	if (!fn[nfa2.qf!][EPSILON])
+		fn[nfa2.qf!][EPSILON] = []
+	fn[nfa2.qf!][EPSILON].push({
+		q: qf,
+		y: '',
+	})
+
+	const automaton = {
 		fn,
 		qs,
 		qf,
 	}
+	addToVisualize(automaton, 'createOnionNfa')
+
+	return automaton
 }
 
 function createConcatNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: NameGenerator): Automaton {
+	console.log('createConcatNfa')
 	const qs = stateNameGenerator.next().value
 	const qf = stateNameGenerator.next().value
 
@@ -173,11 +182,14 @@ function createConcatNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: N
 		fn[q] = nfa1.fn[q]
 	})
 
-	return {
+	const automaton = {
 		fn,
 		qs,
 		qf,
 	}
+	addToVisualize(automaton, 'createConcatNfa')
+
+	return automaton
 }
 
 function createStarNfa(nfa1: Automaton, stateNameGenerator: NameGenerator): Automaton {
@@ -188,38 +200,44 @@ function createStarNfa(nfa1: Automaton, stateNameGenerator: NameGenerator): Auto
 		[qs]: {
 			[EPSILON]: [
 				{
-					q: nfa1.qs!,
-					y: '',
-				},
-				{
 					q: qf,
 					y: '',
 				},
 			],
 		},
-		[qf]: {},
-	}
-	fn[nfa1.qf!] = {
-		[EPSILON]: [
-			{
-				q: qf,
-				y: '',
-			},
-		],
+		[qf]: {
+			[EPSILON]: [
+				{
+					q: nfa1.qs!,
+					y: '',
+				},
+			],
+		},
 	}
 	Object.keys(nfa1.fn).forEach(q => {
 		fn[q] = nfa1.fn[q]
 	})
 
-	return {
+	if (!fn[nfa1.qf!][EPSILON])
+		fn[nfa1.qf!][EPSILON] = []
+	fn[nfa1.qf!][EPSILON].push({
+		q: qs,
+		y: '',
+	})
+
+	const automaton = {
 		fn,
 		qs,
 		qf,
 	}
+	addToVisualize(automaton, 'createStarNfa')
+
+	return automaton
 }
 
 function regexToAutomaton(regex: string): Automaton {
 	const postfixRegex = regexToPostfix(regex)
+	console.log('postfixRegex', postfixRegex)
 
 	const stateNameGenerator = nameGenerator('s')
 
@@ -241,7 +259,10 @@ function regexToAutomaton(regex: string): Automaton {
 		}
 	})
 
-	return nfaStack.pop()!
+	const automaton = nfaStack.pop()!
+	addToVisualize(automaton, 'read regex')
+
+	return automaton
 }
 
 export {
