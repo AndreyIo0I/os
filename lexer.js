@@ -32,11 +32,8 @@ const tokenize_1 = require("./src/utils/tokenize");
 const fileName = process.argv[2] || 'lexer.ts';
 const file = fs_1.default.readFileSync(fileName, 'utf-8');
 try {
-    // if (a > b)
     const tokens = (0, tokenize_1.tokenize)(file);
-    tokens.forEach(v => {
-        console.log(`Token: ${v[0]}, value: ${JSON.stringify(v[1])}, line: ${v[2]}, position: ${v[3]}`);
-    });
+    console.table(tokens, ['token', 'value', 'line', 'position']);
 }
 catch (e) {
     console.log(e);
