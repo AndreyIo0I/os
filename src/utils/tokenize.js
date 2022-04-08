@@ -1,7 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tokenize = void 0;
-const consts_1 = require("../consts");
+const RESERVED_WORDS = new Set(['abstract', 'any', 'as', 'asserts', 'assert', 'bigint', 'boolean', 'break', 'case', 'catch', 'class', 'continue', 'const', 'debugger', 'declare', 'default', 'delete', 'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for', 'from', 'function', 'get', 'if', 'implements', 'import', 'in', 'infer', 'instanceof', 'interface', 'intrinsic', 'is', 'keyof', 'let', 'module', 'namespace', 'never', 'new', 'null', 'number', 'object', 'package', 'private', 'protected', 'public', 'override', 'out', 'readonly', 'require', 'global', 'return', 'set', 'static', 'string', 'super', 'switch', 'symbol', 'this', 'throw', 'true', 'try', 'type', 'typeof', 'undefined', 'unique', 'unknown', 'var', 'void', 'while', 'with', 'yield', 'async', 'await', 'of']);
+function isDigit(ch) {
+    const chCode = ch.charCodeAt(0);
+    return chCode >= 48 && chCode <= 57;
+}
 function isIdentifierStart(ch) {
     const chCode = ch.charCodeAt(0);
     return chCode >= 65 && chCode <= 90 || chCode >= 97 && chCode <= 122 || chCode === 36 || chCode === 95;
@@ -9,8 +13,7 @@ function isIdentifierStart(ch) {
 function isIdentifierPart(ch) {
     if (isIdentifierStart(ch))
         return true;
-    const chCode = ch.charCodeAt(0);
-    return chCode >= 48 && chCode <= 57;
+    return isDigit(ch);
 }
 const trivialTokens = [
     ['{', 'OpenBraceToken'],
@@ -70,8 +73,7 @@ const trivialTokens = [
     ['||=', 'BarBarEqualsToken'],
     ['&&=', 'AmpersandAmpersandEqualsToken'],
     ['??=', 'QuestionQuestionEqualsToken'],
-];
-trivialTokens.sort((a, b) => {
+].sort((a, b) => {
     if (a[0].length < b[0].length)
         return 1;
     else if (a[0].length === b[0].length)
@@ -84,7 +86,7 @@ function tokenize(file) {
     let startPos = 0;
     let line = 1;
     let linePos = 0;
-    let lastToken;
+    let lastToken = '';
     function incLine() {
         ++line;
         linePos = pos;
@@ -114,11 +116,9 @@ function tokenize(file) {
         }
         if (file.substring(pos, pos + 2) === '//') {
             pos += 2;
-            while (!['\n', '\r'].includes(file.charAt(pos)))
+            while (!'\n\r'.includes(file.charAt(pos)))
                 ++pos;
             addToken('LineComment');
-            if (file.substring(pos, pos + 2) === '\r\n')
-                ++pos;
             continue;
         }
         if (file.substring(pos, pos + 2) === '/*') {
@@ -128,30 +128,36 @@ function tokenize(file) {
             addToken('MultilineComment');
             continue;
         }
-        if (ch === '/' && lastToken === 'Number') {
+        if (isDigit(ch)) {
             ++pos;
-            while (['\n', '\r'].includes(file.charAt(pos)))
-                ++pos;
-            addToken('Regexp');
-            continue;
-        }
-        if (ch.match(/\d/)) {
-            ++pos;
-            while (file.charAt(pos).match(/\d/))
+            while (isDigit(file.charAt(pos)))
                 ++pos;
             addToken('Number');
             continue;
         }
         if ('\'\"\`'.includes(ch)) {
             ++pos;
-            while (file.charAt(pos) !== ch || (file.charAt(pos) === ch && file.charAt(pos - 1) === '\\')) {
+            while (file.charAt(pos) !== ch) {
                 if (ch !== '\`' && '\r\n'.includes(file.charAt(pos)))
-                    throw Error(`unexpected ${JSON.stringify(file.charAt(pos))} in string at ${line}:${startPos - linePos + 1}`);
+                    throw Error(`unexpected end of line at ${line}:${pos - linePos + 1}`);
+                if (file.charAt(pos) === '\\')
+                    ++pos;
                 ++pos;
             }
             ++startPos;
             addToken('String');
             ++pos;
+            continue;
+        }
+        if (isIdentifierStart(ch)) {
+            ++pos;
+            while (isIdentifierPart(file.charAt(pos)))
+                ++pos;
+            const identifier = file.substring(startPos, pos);
+            if (RESERVED_WORDS.has(identifier))
+                addToken('ReservedWord');
+            else
+                addToken('Identifier');
             continue;
         }
         let trivialFounded = false;
@@ -166,17 +172,6 @@ function tokenize(file) {
         });
         if (trivialFounded)
             continue;
-        if (isIdentifierStart(ch)) {
-            ++pos;
-            while (isIdentifierPart(file.charAt(pos)))
-                ++pos;
-            const identifier = file.substring(startPos, pos);
-            if (consts_1.RESERVED_WORDS.has(identifier))
-                addToken('ReservedWord');
-            else
-                addToken('Identifier');
-            continue;
-        }
         throw Error(`unexpected ${JSON.stringify(ch)} at ${line}:${startPos - linePos + 1}`);
     }
     return tokens;
