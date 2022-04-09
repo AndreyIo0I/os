@@ -35,5 +35,5 @@ if ((0, utils_1.isMoore)(automaton)) {
 }
 else {
     (0, convert_1.convertToMoore)(automaton);
-    (0, print_1.printAutomaton)(automaton);
+    (0, print_1.printAutomaton)(automaton, false);
 }

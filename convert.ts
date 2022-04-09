@@ -13,5 +13,5 @@ if (isMoore(automaton)) {
 }
 else {
 	convertToMoore(automaton)
-	printAutomaton(automaton)
+	printAutomaton(automaton, false)
 }
