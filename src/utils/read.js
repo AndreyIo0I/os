@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readAutomaton = void 0;
+exports.readRightRegularGrammar = exports.readAutomaton = void 0;
 const fs = __importStar(require("fs"));
 const server_1 = require("./server");
 function getStates(rawData) {
@@ -79,3 +79,38 @@ function readAutomaton(file) {
     return automaton;
 }
 exports.readAutomaton = readAutomaton;
+function readRightRegularGrammar(file) {
+    const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/);
+    const automaton = {
+        fn: {},
+        qs: lines[0][0],
+    };
+    let endStateCount = 0;
+    function createNewState() {
+        const newStateName = '_F' + (endStateCount ? endStateCount++ : '');
+        automaton.fn[newStateName] = {};
+        return newStateName;
+    }
+    lines.forEach(line => {
+        const state = line[0];
+        const transitions = line.substring(5).split('|');
+        if (!automaton.fn[state])
+            automaton.fn[state] = {};
+        transitions.forEach(t => {
+            var _a;
+            const x = t[0];
+            const q = (_a = t[1]) !== null && _a !== void 0 ? _a : createNewState();
+            if (!automaton.fn[state][x])
+                automaton.fn[state][x] = [];
+            automaton.fn[state][x].push({
+                q: q,
+                y: '',
+            });
+            if (!automaton.fn[q])
+                automaton.fn[q] = {};
+        });
+    });
+    (0, server_1.addToVisualize)(automaton, 'read from right regular grammar');
+    return automaton;
+}
+exports.readRightRegularGrammar = readRightRegularGrammar;

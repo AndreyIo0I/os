@@ -58,6 +58,49 @@ function readAutomaton(file: string): Automaton {
 	return automaton
 }
 
+function readRightRegularGrammar(file: string): Automaton {
+	const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/)
+	const automaton : Automaton = {
+		fn: {},
+		qs: lines[0][0],
+	}
+
+	let endStateCount = 0
+	function createNewState() {
+		const newStateName = '_F' + (endStateCount ? endStateCount++ : '')
+		automaton.fn[newStateName] = {}
+		return newStateName
+	}
+
+	lines.forEach(line => {
+		const state = line[0]
+		const transitions = line.substring(5).split('|')
+
+		if (!automaton.fn[state])
+			automaton.fn[state] = {}
+
+		transitions.forEach(t => {
+			const x = t[0]
+			const q = t[1] ?? createNewState()
+
+			if (!automaton.fn[state][x])
+				automaton.fn[state][x] = []
+
+			automaton.fn[state][x].push({
+				q: q,
+				y: '',
+			})
+
+			if (!automaton.fn[q])
+				automaton.fn[q] = {}
+		})
+	})
+
+	addToVisualize(automaton, 'read from right regular grammar')
+	return automaton
+}
+
 export {
 	readAutomaton,
+	readRightRegularGrammar,
 }

@@ -1,6 +1,4 @@
-Ml
-    s0    s1    s2
-x1: s1,s2 s0    s1
-    y1,y3 y2    y1
-x2: s2    s2    s0
-    y2    y2    y1
+A -> bB|bC
+B -> cD
+C -> aD
+D -> b

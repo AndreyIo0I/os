@@ -30,17 +30,22 @@ function removeEpsilons(automaton: Automaton): Automaton {
 	//create closures
 	const epsilonClosures: Array<Set<string>> = []
 	epsilonTransitions.forEach(t => {
-		let closureFinded = false
+		let closureFound = false
 		epsilonClosures.forEach(closure => {
 			if (closure.has(t[0]) || closure.has(t[1])) {
 				closure.add(t[0])
 				closure.add(t[1])
-				closureFinded = true
+				closureFound = true
 			}
 		})
-		if (!closureFinded)
+		if (!closureFound)
 			epsilonClosures.push(new Set(t))
 	})
+	const statesWithoutEpsilons = new Set(Object.keys(automaton.fn))
+	epsilonClosures.forEach(closure => {
+		closure.forEach(q => statesWithoutEpsilons.delete(q))
+	})
+	statesWithoutEpsilons.forEach(q => epsilonClosures.push(new Set([q])))
 
 	//create state map
 	const stateMap: { [q: string]: string } = {}
