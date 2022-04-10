@@ -151,18 +151,18 @@ function createConcatNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: N
 	const qs = stateNameGenerator.next().value
 	const qf = stateNameGenerator.next().value
 
-	nfa1.fn[nfa1.qf!] = {
-		[EPSILON]: [{
+	if (!nfa1.fn[nfa1.qf!][EPSILON])
+		nfa1.fn[nfa1.qf!][EPSILON] = []
+	nfa1.fn[nfa1.qf!][EPSILON].push({
 			q: nfa2.qs!,
 			y: '',
-		}],
-	}
-	nfa2.fn[nfa2.qf!] = {
-		[EPSILON]: [{
-			q: qf,
-			y: '',
-		}],
-	}
+		})
+	if (!nfa2.fn[nfa2.qf!][EPSILON])
+		nfa2.fn[nfa2.qf!][EPSILON] = []
+	nfa2.fn[nfa2.qf!][EPSILON].push({
+		q: qf,
+		y: '',
+	})
 
 	const fn: Transitions = {
 		[qs]: {
@@ -192,47 +192,24 @@ function createConcatNfa(nfa1: Automaton, nfa2: Automaton, stateNameGenerator: N
 	return automaton
 }
 
-function createStarNfa(nfa1: Automaton, stateNameGenerator: NameGenerator): Automaton {
-	const qs = stateNameGenerator.next().value
-	const qf = stateNameGenerator.next().value
+function createStarNfa(nfa1: Automaton): Automaton {
+	if (!nfa1.fn[nfa1.qf!][EPSILON])
+		nfa1.fn[nfa1.qf!][EPSILON] = []
+	if (!nfa1.fn[nfa1.qs!][EPSILON])
+		nfa1.fn[nfa1.qs!][EPSILON] = []
 
-	const fn: Transitions = {
-		[qs]: {
-			[EPSILON]: [
-				{
-					q: qf,
-					y: '',
-				},
-			],
-		},
-		[qf]: {
-			[EPSILON]: [
-				{
-					q: nfa1.qs!,
-					y: '',
-				},
-			],
-		},
-	}
-	Object.keys(nfa1.fn).forEach(q => {
-		fn[q] = nfa1.fn[q]
+	nfa1.fn[nfa1.qf!][EPSILON].push({
+		q: nfa1.qs!,
+		y: '',
 	})
-
-	if (!fn[nfa1.qf!][EPSILON])
-		fn[nfa1.qf!][EPSILON] = []
-	fn[nfa1.qf!][EPSILON].push({
-		q: qs,
+	nfa1.fn[nfa1.qs!][EPSILON].push({
+		q: nfa1.qf!,
 		y: '',
 	})
 
-	const automaton = {
-		fn,
-		qs,
-		qf,
-	}
-	addToVisualize(automaton, 'createStarNfa')
+	addToVisualize(nfa1, 'createStarNfa')
 
-	return automaton
+	return nfa1
 }
 
 function regexToAutomaton(regex: string): Automaton {
@@ -255,7 +232,7 @@ function regexToAutomaton(regex: string): Automaton {
 			nfaStack.push(createConcatNfa(nfa2, nfa1, stateNameGenerator))
 		}
 		else if (v === '*') {
-			nfaStack.push(createStarNfa(nfaStack.pop()!, stateNameGenerator))
+			nfaStack.push(createStarNfa(nfaStack.pop()!))
 		}
 	})
 

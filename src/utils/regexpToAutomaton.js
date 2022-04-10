@@ -134,18 +134,18 @@ function createConcatNfa(nfa1, nfa2, stateNameGenerator) {
     console.log('createConcatNfa');
     const qs = stateNameGenerator.next().value;
     const qf = stateNameGenerator.next().value;
-    nfa1.fn[nfa1.qf] = {
-        [consts_1.EPSILON]: [{
-                q: nfa2.qs,
-                y: '',
-            }],
-    };
-    nfa2.fn[nfa2.qf] = {
-        [consts_1.EPSILON]: [{
-                q: qf,
-                y: '',
-            }],
-    };
+    if (!nfa1.fn[nfa1.qf][consts_1.EPSILON])
+        nfa1.fn[nfa1.qf][consts_1.EPSILON] = [];
+    nfa1.fn[nfa1.qf][consts_1.EPSILON].push({
+        q: nfa2.qs,
+        y: '',
+    });
+    if (!nfa2.fn[nfa2.qf][consts_1.EPSILON])
+        nfa2.fn[nfa2.qf][consts_1.EPSILON] = [];
+    nfa2.fn[nfa2.qf][consts_1.EPSILON].push({
+        q: qf,
+        y: '',
+    });
     const fn = {
         [qs]: {
             [consts_1.EPSILON]: [
@@ -171,43 +171,21 @@ function createConcatNfa(nfa1, nfa2, stateNameGenerator) {
     (0, server_1.addToVisualize)(automaton, 'createConcatNfa');
     return automaton;
 }
-function createStarNfa(nfa1, stateNameGenerator) {
-    const qs = stateNameGenerator.next().value;
-    const qf = stateNameGenerator.next().value;
-    const fn = {
-        [qs]: {
-            [consts_1.EPSILON]: [
-                {
-                    q: qf,
-                    y: '',
-                },
-            ],
-        },
-        [qf]: {
-            [consts_1.EPSILON]: [
-                {
-                    q: nfa1.qs,
-                    y: '',
-                },
-            ],
-        },
-    };
-    Object.keys(nfa1.fn).forEach(q => {
-        fn[q] = nfa1.fn[q];
-    });
-    if (!fn[nfa1.qf][consts_1.EPSILON])
-        fn[nfa1.qf][consts_1.EPSILON] = [];
-    fn[nfa1.qf][consts_1.EPSILON].push({
-        q: qs,
+function createStarNfa(nfa1) {
+    if (!nfa1.fn[nfa1.qf][consts_1.EPSILON])
+        nfa1.fn[nfa1.qf][consts_1.EPSILON] = [];
+    if (!nfa1.fn[nfa1.qs][consts_1.EPSILON])
+        nfa1.fn[nfa1.qs][consts_1.EPSILON] = [];
+    nfa1.fn[nfa1.qf][consts_1.EPSILON].push({
+        q: nfa1.qs,
         y: '',
     });
-    const automaton = {
-        fn,
-        qs,
-        qf,
-    };
-    (0, server_1.addToVisualize)(automaton, 'createStarNfa');
-    return automaton;
+    nfa1.fn[nfa1.qs][consts_1.EPSILON].push({
+        q: nfa1.qf,
+        y: '',
+    });
+    (0, server_1.addToVisualize)(nfa1, 'createStarNfa');
+    return nfa1;
 }
 function regexToAutomaton(regex) {
     const postfixRegex = regexToPostfix(regex);
@@ -227,7 +205,7 @@ function regexToAutomaton(regex) {
             nfaStack.push(createConcatNfa(nfa2, nfa1, stateNameGenerator));
         }
         else if (v === '*') {
-            nfaStack.push(createStarNfa(nfaStack.pop(), stateNameGenerator));
+            nfaStack.push(createStarNfa(nfaStack.pop()));
         }
     });
     const automaton = nfaStack.pop();
