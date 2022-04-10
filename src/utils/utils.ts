@@ -5,16 +5,14 @@ function deepCopy<T>(value: T): T {
 }
 
 function isMoore(automaton: Automaton): boolean {
-	const stateToValue: { [q: string]: string } = {}
 	for (const q of Object.keys(automaton.fn)) {
+		let valueOfState
 		for (const x of Object.keys(automaton.fn[q])) {
 			for (const transition of automaton.fn[q][x]) {
-				if (stateToValue[transition.q] && stateToValue[transition.q] !== transition.y) {
+				if (valueOfState === undefined)
+					valueOfState = transition.y
+				if (valueOfState !== transition.y)
 					return false
-				}
-				else {
-					stateToValue[transition.q] = transition.y
-				}
 			}
 		}
 	}

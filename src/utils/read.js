@@ -42,15 +42,19 @@ function readAutomaton(file) {
         const outputs = lines[2].trim().split(/\s+/);
         for (let i = 3; i < lines.length; ++i) {
             const [x, newStates] = getStates(lines[i]);
-            states.forEach(q => {
+            for (let j = 0; j < states.length; ++j) {
+                const q = states[j];
+                const y = outputs[j];
                 automaton.fn[q] = automaton.fn[q] || {};
                 automaton.fn[q][x] = [];
                 const newQ = newStates.shift();
+                if (!states.includes(newQ))
+                    automaton.fn[newQ] = {};
                 automaton.fn[q][x].push({
                     q: newQ,
-                    y: outputs[states.indexOf(newQ)],
+                    y: y,
                 });
-            });
+            }
         }
     }
     else if (lines[0] === 'Ml') {
@@ -67,6 +71,8 @@ function readAutomaton(file) {
                     throw Error(`Number of new states and signals doesn't match`);
                 }
                 for (let i = 0; i < transitionNewStates.length; ++i) {
+                    if (!automaton.fn[transitionNewStates[i]])
+                        automaton.fn[transitionNewStates[i]] = {};
                     automaton.fn[q][x].push({
                         q: transitionNewStates[i],
                         y: transitionOutputSignals[i],
