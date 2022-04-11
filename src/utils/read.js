@@ -87,34 +87,56 @@ function readAutomaton(file) {
 exports.readAutomaton = readAutomaton;
 function readRightRegularGrammar(file) {
     const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/);
+    const leftRegular = lines.shift() === 'L';
     const automaton = {
         fn: {},
         qs: lines[0][0],
     };
     let endStateCount = 0;
-    function createNewState() {
-        const newStateName = '_F' + (endStateCount ? endStateCount++ : '');
+    function createNewState(base) {
+        const newStateName = base + (endStateCount ? endStateCount : '');
+        ++endStateCount;
         automaton.fn[newStateName] = {};
         return newStateName;
     }
     lines.forEach(line => {
         const state = line[0];
-        const transitions = line.substring(5).split('|');
-        if (!automaton.fn[state])
-            automaton.fn[state] = {};
-        transitions.forEach(t => {
-            var _a;
-            const x = t[0];
-            const q = (_a = t[1]) !== null && _a !== void 0 ? _a : createNewState();
-            if (!automaton.fn[state][x])
-                automaton.fn[state][x] = [];
-            automaton.fn[state][x].push({
-                q: q,
-                y: '',
+        const transitions = line.substring(5).trim().split(/\s*\|\s*/);
+        if (leftRegular) {
+            transitions.forEach(t => {
+                const x = t.length == 2 ? t[1] : t[0];
+                const q = t.length == 2 ? t[0] : '_S';
+                if (t.length == 1 && automaton.qs === state)
+                    automaton.qs = q;
+                if (!automaton.fn[q])
+                    automaton.fn[q] = {};
+                if (!automaton.fn[q][x])
+                    automaton.fn[q][x] = [];
+                automaton.fn[q][x].push({
+                    q: state,
+                    y: '',
+                });
+                if (!automaton.fn[state])
+                    automaton.fn[state] = {};
             });
-            if (!automaton.fn[q])
-                automaton.fn[q] = {};
-        });
+        }
+        else {
+            if (!automaton.fn[state])
+                automaton.fn[state] = {};
+            transitions.forEach(t => {
+                var _a;
+                const x = t[0];
+                const q = (_a = t[1]) !== null && _a !== void 0 ? _a : createNewState('_F');
+                if (!automaton.fn[state][x])
+                    automaton.fn[state][x] = [];
+                automaton.fn[state][x].push({
+                    q: q,
+                    y: '',
+                });
+                if (!automaton.fn[q])
+                    automaton.fn[q] = {};
+            });
+        }
     });
     (0, server_1.addToVisualize)(automaton, 'read from right regular grammar');
     return automaton;

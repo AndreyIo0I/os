@@ -11,7 +11,7 @@ function getStates(rawData: string): [string, Array<string>] {
 
 function readAutomaton(file: string): Automaton {
 	const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/)
-	const automaton : Automaton = {
+	const automaton: Automaton = {
 		fn: {},
 	}
 
@@ -66,40 +66,66 @@ function readAutomaton(file: string): Automaton {
 
 function readRightRegularGrammar(file: string): Automaton {
 	const lines = fs.readFileSync(file, 'utf-8').trim().split(/(?:\r\n)+/)
-	const automaton : Automaton = {
+	const leftRegular = lines.shift() === 'L'
+	const automaton: Automaton = {
 		fn: {},
 		qs: lines[0][0],
 	}
 
 	let endStateCount = 0
-	function createNewState() {
-		const newStateName = '_F' + (endStateCount ? endStateCount++ : '')
+
+	function createNewState(base: string) {
+		const newStateName = base + (endStateCount ? endStateCount : '')
+		++endStateCount
 		automaton.fn[newStateName] = {}
 		return newStateName
 	}
 
 	lines.forEach(line => {
 		const state = line[0]
-		const transitions = line.substring(5).split('|')
+		const transitions = line.substring(5).trim().split(/\s*\|\s*/)
 
-		if (!automaton.fn[state])
-			automaton.fn[state] = {}
+		if (leftRegular) {
+			transitions.forEach(t => {
+				const x = t.length == 2 ? t[1] : t[0]
+				const q = t.length == 2 ? t[0] : '_S'
 
-		transitions.forEach(t => {
-			const x = t[0]
-			const q = t[1] ?? createNewState()
+				if (t.length == 1 && automaton.qs === state)
+					automaton.qs = q
+				if (!automaton.fn[q])
+					automaton.fn[q] = {}
+				if (!automaton.fn[q][x])
+					automaton.fn[q][x] = []
 
-			if (!automaton.fn[state][x])
-				automaton.fn[state][x] = []
+				automaton.fn[q][x].push({
+					q: state,
+					y: '',
+				})
 
-			automaton.fn[state][x].push({
-				q: q,
-				y: '',
+				if (!automaton.fn[state])
+					automaton.fn[state] = {}
 			})
+		}
+		else {
+			if (!automaton.fn[state])
+				automaton.fn[state] = {}
 
-			if (!automaton.fn[q])
-				automaton.fn[q] = {}
-		})
+			transitions.forEach(t => {
+				const x = t[0]
+				const q = t[1] ?? createNewState('_F')
+
+				if (!automaton.fn[state][x])
+					automaton.fn[state][x] = []
+
+				automaton.fn[state][x].push({
+					q: q,
+					y: '',
+				})
+
+				if (!automaton.fn[q])
+					automaton.fn[q] = {}
+			})
+		}
 	})
 
 	addToVisualize(automaton, 'read from right regular grammar')

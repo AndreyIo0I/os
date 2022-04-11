@@ -1,4 +1,3 @@
-A -> bB|bC
-B -> cD
-C -> aD
-D -> b
+L
+S -> Ab | b
+A -> Sc | c
