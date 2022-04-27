@@ -95,13 +95,6 @@ function readRightRegularGrammar(file) {
         fn: {},
         qs: lines[0][0],
     };
-    let endStateCount = 0;
-    function createNewState(base) {
-        const newStateName = base + (endStateCount ? endStateCount : '');
-        ++endStateCount;
-        automaton.fn[newStateName] = {};
-        return newStateName;
-    }
     lines.forEach(line => {
         const state = line[0];
         const transitions = line.substring(5).trim().split(/\s*\|\s*/);
@@ -124,12 +117,13 @@ function readRightRegularGrammar(file) {
             });
         }
         else {
+            automaton.qf = 'H';
             if (!automaton.fn[state])
                 automaton.fn[state] = {};
             transitions.forEach(t => {
                 var _a;
                 const x = t[0];
-                const q = (_a = t[1]) !== null && _a !== void 0 ? _a : createNewState('_F');
+                const q = (_a = t[1]) !== null && _a !== void 0 ? _a : automaton.qf;
                 if (!automaton.fn[state][x])
                     automaton.fn[state][x] = [];
                 automaton.fn[state][x].push({
@@ -142,6 +136,8 @@ function readRightRegularGrammar(file) {
         }
     });
     (0, server_1.addToVisualize)(automaton, 'read from right regular grammar');
+    console.log('==========read==========');
+    (0, print_1.printAutomaton)(automaton);
     return automaton;
 }
 exports.readRightRegularGrammar = readRightRegularGrammar;

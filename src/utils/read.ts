@@ -75,15 +75,6 @@ function readRightRegularGrammar(file: string): Automaton {
 		qs: lines[0][0],
 	}
 
-	let endStateCount = 0
-
-	function createNewState(base: string) {
-		const newStateName = base + (endStateCount ? endStateCount : '')
-		++endStateCount
-		automaton.fn[newStateName] = {}
-		return newStateName
-	}
-
 	lines.forEach(line => {
 		const state = line[0]
 		const transitions = line.substring(5).trim().split(/\s*\|\s*/)
@@ -110,12 +101,13 @@ function readRightRegularGrammar(file: string): Automaton {
 			})
 		}
 		else {
+			automaton.qf = 'H'
 			if (!automaton.fn[state])
 				automaton.fn[state] = {}
 
 			transitions.forEach(t => {
 				const x = t[0]
-				const q = t[1] ?? createNewState('_F')
+				const q = t[1] ?? automaton.qf
 
 				if (!automaton.fn[state][x])
 					automaton.fn[state][x] = []
@@ -132,6 +124,8 @@ function readRightRegularGrammar(file: string): Automaton {
 	})
 
 	addToVisualize(automaton, 'read from right regular grammar')
+	console.log('==========read==========')
+	printAutomaton(automaton)
 	return automaton
 }
 
