@@ -28,7 +28,8 @@ const process = __importStar(require("process"));
 const convert_1 = require("./src/utils/convert");
 const utils_1 = require("./src/utils/utils");
 const print_1 = require("./src/utils/print");
-const file = process.argv[2] || 'moore.txt';
+const server_1 = require("./src/utils/server");
+const file = process.argv[2] || 'test_data/mealy-moore/1/input.txt';
 const automaton = (0, read_1.readAutomaton)(file);
 if ((0, utils_1.isMoore)(automaton)) {
     (0, print_1.printAutomaton)(automaton);
@@ -37,3 +38,4 @@ else {
     (0, convert_1.convertToMoore)(automaton);
     (0, print_1.printAutomaton)(automaton, false);
 }
+(0, server_1.runServer)();

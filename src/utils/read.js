@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.readRightRegularGrammar = exports.readAutomaton = void 0;
 const fs = __importStar(require("fs"));
 const server_1 = require("./server");
+const print_1 = require("./print");
 function getStates(rawData) {
     return [
         rawData.split(':')[0].trim(),
@@ -82,6 +83,8 @@ function readAutomaton(file) {
         }
     }
     (0, server_1.addToVisualize)(automaton, 'read from file');
+    console.log('==========read==========');
+    (0, print_1.printAutomaton)(automaton);
     return automaton;
 }
 exports.readAutomaton = readAutomaton;

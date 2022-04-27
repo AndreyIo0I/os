@@ -1,6 +1,7 @@
 import {Automaton} from '../types/types'
 import * as fs from 'fs'
 import {addToVisualize} from './server'
+import {printAutomaton} from './print'
 
 function getStates(rawData: string): [string, Array<string>] {
 	return [
@@ -61,6 +62,8 @@ function readAutomaton(file: string): Automaton {
 	}
 
 	addToVisualize(automaton, 'read from file')
+	console.log('==========read==========')
+	printAutomaton(automaton)
 	return automaton
 }
 

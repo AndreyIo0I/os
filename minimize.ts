@@ -5,7 +5,7 @@ import * as util from 'util'
 import {runServer} from './src/utils/server'
 import {printAutomaton} from './src/utils/print'
 
-const filePath = process.argv[2] || 'minimize.txt'
+const filePath = process.argv[2] || 'test_data/minimize/1/input.txt'
 const automaton = readAutomaton(filePath)
 
 minimize(automaton)

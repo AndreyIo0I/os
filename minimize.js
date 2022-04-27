@@ -29,7 +29,7 @@ const process = __importStar(require("process"));
 const util = __importStar(require("util"));
 const server_1 = require("./src/utils/server");
 const print_1 = require("./src/utils/print");
-const filePath = process.argv[2] || 'minimize.txt';
+const filePath = process.argv[2] || 'test_data/minimize/1/input.txt';
 const automaton = (0, read_1.readAutomaton)(filePath);
 (0, minimize_1.minimize)(automaton);
 console.log('==========minimized==========');

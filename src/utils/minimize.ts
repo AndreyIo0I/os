@@ -72,6 +72,8 @@ function minimize(automaton: Automaton): void {
 		if (Object.keys(newEquivalences).length !== Object.keys(equivalences).length) {
 			smashed = true
 		}
+		console.log('=====equivalences=====')
+		console.log(equivalences)
 		equivalences = deepCopy(newEquivalences)
 		stateToEquivalence = deepCopy(newStateToEquivalence)
 	}

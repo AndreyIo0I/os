@@ -1,0 +1,5 @@
+Mr
+    A B C D E G
+    1 1 1 0 0 0
+x1: I B C I D E
+x2: C I G C E F
