@@ -29,7 +29,7 @@ const print_1 = require("./src/utils/print");
 const determine_1 = require("./src/utils/determine");
 const server_1 = require("./src/utils/server");
 const minimize_1 = require("./src/utils/minimize");
-const file = process.argv[2] || 'determine.txt';
+const file = process.argv[2] || 'test_data/determine/1/input.txt';
 let automaton = (0, read_1.readRightRegularGrammar)(file);
 automaton = (0, determine_1.determine)(automaton);
 (0, minimize_1.minimize)(automaton);

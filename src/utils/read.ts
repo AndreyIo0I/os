@@ -82,7 +82,7 @@ function readRightRegularGrammar(file: string): Automaton {
 		if (leftRegular) {
 			transitions.forEach(t => {
 				const x = t.length == 2 ? t[1] : t[0]
-				const q = t.length == 2 ? t[0] : '_S'
+				const q = t.length == 2 ? t[0] : 'H'
 
 				if (t.length == 1 && automaton.qs === state)
 					automaton.qs = q

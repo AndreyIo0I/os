@@ -5,7 +5,7 @@ import {determine} from './src/utils/determine'
 import {runServer} from './src/utils/server'
 import {minimize} from './src/utils/minimize'
 
-const file = process.argv[2] || 'determine.txt'
+const file = process.argv[2] || 'test_data/determine/1/input.txt'
 
 let automaton = readRightRegularGrammar(file)
 

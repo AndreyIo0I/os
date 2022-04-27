@@ -10,7 +10,7 @@ const getDirectories = (source: PathLike) =>
 
 const TEST_DIR = 'test_data/'
 
-describe('all tests', () => {
+describe('all tests', () => { //not all, надо тогда будет чтение автомата дорабатывать до нка с состояниями без переходов
 	getDirectories(TEST_DIR + 'mealy-moore/').forEach(dir => {
 		test('mealy-moore ' + dir, () => {
 			const automaton: Automaton = readAutomaton(TEST_DIR + 'mealy-moore/' + dir + '/input.txt')

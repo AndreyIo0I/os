@@ -18,12 +18,12 @@ ____
 ____
 ## (1) Минимизация.
 ```
-> node minimize
+> node minimize test_data/minimize/1/input.txt
 ```
 ____
 ## (2) Детерминирование.
 ```
-> node determine
+> node determine test_data/determine/1/input.txt
 ```
 ____
 ## (3) Регулярные выражения и автоматы.
