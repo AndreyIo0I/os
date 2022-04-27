@@ -1,6 +1,6 @@
 Ml
     A C D E F
-x1: F B C D E
+x1: F A C D E
     0 0 0 0 1
-x2: B C B A F
+x2: A C A A F
     1 1 1 1 1
